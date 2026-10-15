@@ -1,0 +1,425 @@
+/* ===== Intro (close-up) + Hub (hologram) scenes ===== */
+:root{--cy:#00e5ff;--cy2:#00b8d4;--ink:#cfefff;--ink2:#8fd6e2;--deep:#02070a}
+
+.scene{position:absolute;inset:0;z-index:12;overflow:hidden;background:var(--deep);opacity:0;transition:opacity .9s ease;
+  font-family:'Rajdhani','Segoe UI',system-ui,sans-serif;color:var(--ink)}
+.scene.show{opacity:1}
+
+/* ---------- Intro ---------- */
+.kb{position:absolute;inset:0;transform-origin:72% 42%;animation:kb 18s ease-out forwards}
+@keyframes kb{from{transform:scale(1)}to{transform:scale(1.07)}}
+.sceneImg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.eye{position:absolute;border-radius:50%;pointer-events:none;mix-blend-mode:screen;opacity:.35;
+  background:radial-gradient(circle,rgba(200,255,255,.95) 0,rgba(0,229,255,.55) 35%,rgba(0,229,255,0) 70%);
+  animation:eyePulse 2.4s ease-in-out infinite}
+@keyframes eyePulse{0%,100%{opacity:.3;transform:scale(.85)}50%{opacity:.9;transform:scale(1.25)}}
+#intro.firing .eye{animation:none;opacity:1;transform:scale(2.6);transition:transform .5s ease-out,opacity .3s}
+#beamBar{position:absolute;height:6px;width:0;transform-origin:100% 50%;border-radius:6px;opacity:0;pointer-events:none;
+  background:linear-gradient(90deg,rgba(0,229,255,0),#bffcff 35%,#fff);box-shadow:0 0 26px 7px rgba(0,229,255,.85);
+  transition:width .6s cubic-bezier(.2,.7,.2,1),transform .7s ease-in,opacity .2s}
+.introScrim{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,rgba(2,7,10,.62) 0,rgba(2,7,10,.28) 40%,rgba(2,7,10,0) 60%),
+             linear-gradient(0deg,rgba(2,7,10,.55) 0,rgba(2,7,10,0) 35%)}
+[data-mode=mobile] .introScrim{background:linear-gradient(0deg,rgba(2,7,10,.94) 0,rgba(2,7,10,.7) 30%,rgba(2,7,10,0) 58%)}
+#introText{position:absolute;z-index:3;left:max(6vw,16px);width:min(48vw,580px);bottom:max(5vh,18px);display:flex;flex-direction:column;gap:clamp(6px,1.5vh,12px)}
+[data-mode=mobile] #introText{left:max(18px,env(safe-area-inset-left,0px));right:max(18px,env(safe-area-inset-right,0px));width:auto;top:auto;bottom:calc(6% + env(safe-area-inset-bottom,0px))}
+#introText>*{opacity:0;transform:translateY(8px);transition:opacity .7s ease,transform .7s ease}
+#introText>.in{opacity:1;transform:none}
+.eyebrow{font:400 13px 'Share Tech Mono',monospace;letter-spacing:.3em;color:var(--cy);text-shadow:0 0 10px rgba(0,229,255,.7)}
+#introName{font:800 clamp(22px,min(4.1vw,7.4vh),54px)/1.1 'Orbitron','Segoe UI',sans-serif;letter-spacing:.02em;text-shadow:0 0 20px rgba(0,229,255,.55);min-height:1.1em}
+#introName.in::after{content:'';display:inline-block;width:.5ch;height:.9em;margin-left:4px;background:var(--cy);vertical-align:-.1em;animation:blink 1s steps(1) infinite}
+#introName.done::after{display:none}
+@keyframes blink{50%{opacity:0}}
+.role{font:600 clamp(15px,1.7vw,22px) 'Rajdhani',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
+.line{font:500 clamp(15px,1.5vw,19px)/1.45 'Rajdhani',sans-serif;max-width:46ch}
+.holoBtn{align-self:flex-start;padding:clamp(9px,1.8vh,13px) 26px;font:700 14px 'Orbitron','Segoe UI',sans-serif;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--cy);background:rgba(0,229,255,.08);border:1px solid var(--cy);border-radius:4px;cursor:pointer;
+  box-shadow:0 0 16px rgba(0,229,255,.38),inset 0 0 12px rgba(0,229,255,.15);text-shadow:0 0 8px rgba(0,229,255,.8);
+  -webkit-tap-highlight-color:transparent}
+.holoBtn:hover{background:rgba(0,229,255,.18)}
+.holoBtn:focus-visible{outline:2px solid #fff;outline-offset:3px}
+#flash{position:fixed;inset:0;z-index:200;pointer-events:none;opacity:0;
+  background:radial-gradient(circle at var(--fx,50%) var(--fy,50%),#fff 0,#c8fcff 30%,#00e5ff 100%);transition:opacity .45s ease-in}
+#flash.go{opacity:1}
+#flash.out{opacity:0;transition:opacity 1.1s ease-out}
+
+/* ---------- Hub ---------- */
+#hubImg{position:absolute;max-width:none;display:block}
+#handGlow{position:absolute;width:90px;height:90px;margin:-45px 0 0 -45px;border-radius:50%;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(circle,rgba(190,255,255,.8) 0,rgba(0,229,255,.4) 38%,rgba(0,229,255,0) 70%);animation:eyePulse 1.8s ease-in-out infinite}
+#hubPanel{position:absolute;z-index:3;transform-origin:0 0;container-type:inline-size;display:flex;flex-direction:column;overflow:hidden;
+  background:rgba(2,16,22,.8);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  border:1px solid rgba(0,229,255,.6);border-radius:6px;box-shadow:0 0 28px rgba(0,229,255,.3),inset 0 0 44px rgba(0,229,255,.08)}
+#hubPanel::after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,229,255,.045) 0 1px,transparent 1px 3px)}
+#hubPanel.holoOn{animation:holoOn 1.2s ease-out .15s both}
+@keyframes holoOn{0%{clip-path:inset(49% 0 49% 0);opacity:.2;filter:brightness(2.2)}55%{clip-path:inset(0 0 0 0);opacity:.9;filter:brightness(1.6)}100%{clip-path:inset(0 0 0 0);opacity:1;filter:none}}
+#hubTabs{display:flex;flex:none;border-bottom:1px solid rgba(0,229,255,.38);position:relative;z-index:1}
+#hubTabs button{flex:1;padding:.85em .3em;font:700 clamp(10px,2.4cqw,13px) 'Orbitron','Segoe UI',sans-serif;letter-spacing:.12em;text-transform:uppercase;
+  color:#6fb4c0;background:transparent;border:0;border-bottom:2px solid transparent;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#hubTabs button:hover{color:#d9fbff}
+#hubTabs button[aria-selected=true]{color:#eaffff;border-bottom-color:var(--cy);background:rgba(0,229,255,.11);text-shadow:0 0 10px var(--cy)}
+#hubTabs button:focus-visible{outline:2px solid #fff;outline-offset:-3px}
+#hubBody{flex:1;min-height:0;overflow:auto;padding:4.2cqw 4.6cqw;font:500 clamp(13px,2.55cqw,16.5px)/1.5 'Rajdhani','Segoe UI',sans-serif;
+  scrollbar-width:thin;scrollbar-color:#00b8d4 transparent;position:relative;z-index:1}
+#hubBody>*{animation:rise .5s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.lbl{font:400 .8em 'Share Tech Mono',monospace;letter-spacing:.24em;text-transform:uppercase;color:var(--cy);margin:0 0 .6em;text-shadow:0 0 8px rgba(0,229,255,.6)}
+.lbl:not(:first-child){margin-top:1.5em}
+#hubBody p{margin:0 0 .7em;color:var(--ink)}
+.tl{list-style:none;margin:0;padding:0 0 0 1.1em;border-left:1px solid rgba(0,229,255,.45)}
+.tl li{position:relative;padding:0 0 .8em .4em}
+.tl li::before{content:'';position:absolute;left:calc(-1.1em - 4px);top:.55em;width:7px;height:7px;border-radius:50%;background:var(--cy);box-shadow:0 0 8px var(--cy)}
+.tl b{display:block;font:700 1em 'Orbitron','Segoe UI',sans-serif;letter-spacing:.04em;font-size:.88em}
+.tl span{color:var(--ink2)}
+.chips{display:flex;flex-wrap:wrap;gap:.45em}
+.chip{padding:.18em .7em;border:1px solid rgba(0,229,255,.5);border-radius:3px;background:rgba(0,229,255,.07);color:#d9fbff;font-size:.95em;letter-spacing:.04em}
+.card{border:1px solid rgba(0,229,255,.32);background:rgba(0,229,255,.05);padding:.8em .95em;margin:0 0 .75em;border-radius:4px}
+.card h4{margin:0;font:700 .98em 'Orbitron','Segoe UI',sans-serif;letter-spacing:.05em;color:#eaffff}
+.card .tag{font:400 .8em 'Share Tech Mono',monospace;letter-spacing:.14em;color:var(--cy);text-transform:uppercase;margin:.25em 0 .5em}
+.card p{margin:0 0 .6em}
+.row{display:flex;align-items:center;gap:.8em;padding:.7em .85em;margin:0 0 .6em;border:1px solid rgba(0,229,255,.32);border-radius:4px;background:rgba(0,229,255,.05);min-width:0}
+.row .k{flex:none;min-width:5.2em;font:400 .8em 'Share Tech Mono',monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--cy)}
+.row .v{flex:1;min-width:0;overflow-wrap:anywhere;color:#eaffff;user-select:all}
+.row a.v{text-decoration:none}
+.row a.v:hover{text-decoration:underline}
+.mini{flex:none;padding:.25em .8em;font:700 .75em 'Orbitron','Segoe UI',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--cy);
+  background:transparent;border:1px solid var(--cy);border-radius:3px;cursor:pointer;text-decoration:none}
+.mini:hover{background:rgba(0,229,255,.18)}
+.mini:focus-visible,.row a:focus-visible{outline:2px solid #fff;outline-offset:2px}
+
+#robotBubble{position:absolute;z-index:4;max-width:min(270px,62vw);padding:10px 14px;font:400 13.5px/1.4 'Share Tech Mono',monospace;color:#d9fbff;
+  background:rgba(2,16,22,.88);border:1px solid rgba(0,229,255,.65);border-radius:4px;box-shadow:0 0 16px rgba(0,229,255,.4);min-height:2.5em}
+#robotBubble::before{content:'▸ ';color:var(--cy)}
+[data-mode=desktop] #robotBubble::after{content:'';position:absolute;left:50%;bottom:-7px;width:12px;height:12px;background:rgba(2,16,22,.95);
+  border-right:1px solid rgba(0,229,255,.65);border-bottom:1px solid rgba(0,229,255,.65);transform:translateX(-50%) rotate(45deg)}
+
+@media (prefers-reduced-motion:reduce){.kb,.eye,#handGlow,#introName.in::after{animation:none}#hubBody>*{animation:none}}
+
+/* small screens: keep contact rows on one line */
+[data-mode=mobile] .row{gap:.55em;padding:.65em .7em}
+[data-mode=mobile] .row .k{min-width:3.4em;letter-spacing:.08em}
+[data-mode=mobile] .row .v{font-size:.92em}
+
+/* ================= Scrolling site ================= */
+html.site,html.site body{overflow-x:hidden;overflow-y:auto;height:auto;background:#02070a}
+html.modalOpen,html.modalOpen body{overflow:hidden}
+#site{position:relative;background:#02070a;font-family:'Rajdhani','Segoe UI',system-ui,sans-serif;color:var(--ink)}
+#site.hidden{display:none}
+#hub{position:relative;height:100vh;height:100svh;min-height:520px;overflow:hidden;background:#02070a}
+.hidden{display:none}
+
+#scrollCue{position:absolute;z-index:5;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:2px;
+  background:rgba(2,16,22,.55);border:1px solid rgba(0,229,255,.45);border-radius:20px;padding:6px 16px 4px;color:var(--cy);cursor:pointer;
+  font:400 11px 'Share Tech Mono',monospace;letter-spacing:.3em;text-transform:uppercase;-webkit-tap-highlight-color:transparent}
+#scrollCue i{width:9px;height:9px;border-right:2px solid var(--cy);border-bottom:2px solid var(--cy);transform:rotate(45deg);animation:cue 1.6s ease-in-out infinite;margin-top:-2px}
+@keyframes cue{0%,100%{transform:translateY(-2px) rotate(45deg);opacity:.4}50%{transform:translateY(3px) rotate(45deg);opacity:1}}
+#scrollCue:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+.quote{margin:0 0 .8em;padding:.2em 0 .2em .8em;border-left:2px solid var(--cy);font:700 1.18em/1.3 'Orbitron','Segoe UI',sans-serif;color:#eaffff;text-shadow:0 0 14px rgba(0,229,255,.6)}
+.note{margin:.9em 0 0;padding:.7em .85em;border:1px solid rgba(0,229,255,.4);border-radius:4px;background:rgba(0,229,255,.07);font:400 .88em/1.5 'Share Tech Mono',monospace;color:#bff6ff}
+#hubTabs em{font-style:normal}
+
+/* phones: the text sits inside the hologram frame */
+[data-mode=mobile] #hubPanel{border-radius:4px;background:rgba(2,16,22,.72)}
+[data-mode=mobile] #robotBubble{font-size:11.5px;padding:7px 10px}
+
+/* ---------- shared section pieces ---------- */
+#capsules,#contact{position:relative;overflow:hidden;background:#02070a}
+.secBg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.secShade{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,#02070a 0,rgba(2,7,10,.35) 22%,rgba(2,7,10,.3) 70%,#02070a 100%),radial-gradient(ellipse at 50% 60%,rgba(0,229,255,.1),transparent 60%)}
+
+/* ---------- Capsules ---------- */
+#capsules{min-height:100vh;min-height:100svh;padding:clamp(56px,9vh,96px) 0 clamp(48px,8vh,84px);display:flex;flex-direction:column;justify-content:center}
+.secHead{position:relative;z-index:2;text-align:center;padding:0 20px;margin-bottom:clamp(22px,4vh,44px)}
+.secHead .eyebrow{margin:0 0 6px}
+.secHead h2{font:800 clamp(26px,4vw,46px)/1.1 'Orbitron','Segoe UI',sans-serif;letter-spacing:.04em;text-shadow:0 0 22px rgba(0,229,255,.5);color:#eaffff}
+.secHead .hint{margin:10px 0 0;font:400 13px 'Share Tech Mono',monospace;letter-spacing:.14em;color:var(--ink2)}
+.capTrack{position:relative;z-index:2;display:flex;justify-content:center;align-items:stretch;gap:clamp(18px,3vw,44px);padding:0 clamp(16px,4vw,56px)}
+
+.cap{position:relative;flex:1 1 0;max-width:340px;min-width:0;display:flex;flex-direction:column;align-items:stretch;cursor:pointer;
+  opacity:0;transform:translateY(34px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1);-webkit-tap-highlight-color:transparent}
+.cap.in{opacity:1;transform:none}
+.cap:nth-child(2){transition-delay:.15s}.cap:nth-child(3){transition-delay:.3s}
+.cap:focus-visible{outline:2px solid #fff;outline-offset:6px;border-radius:30px}
+.capTop{height:20px;margin:0 14%;border-radius:12px 12px 0 0;background:linear-gradient(180deg,#27414a,#10222a);border:1px solid rgba(0,229,255,.5);border-bottom:0;position:relative}
+.capTop .led{position:absolute;left:50%;top:6px;width:30%;height:4px;margin-left:-15%;border-radius:4px;background:var(--cy);box-shadow:0 0 10px var(--cy);animation:ledp 2.4s ease-in-out infinite}
+@keyframes ledp{50%{opacity:.35}}
+.tube{position:relative;flex:1;display:flex;flex-direction:column;overflow:hidden;
+  border:1px solid rgba(0,229,255,.7);border-radius:46px 46px 14px 14px / 56px 56px 14px 14px;
+  background:linear-gradient(180deg,rgba(0,40,52,.62),rgba(2,16,22,.82));-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+  box-shadow:0 0 26px rgba(0,229,255,.32),inset 0 0 40px rgba(0,229,255,.12);transition:box-shadow .5s,border-color .5s}
+.cap:hover .tube,.cap:focus-visible .tube{box-shadow:0 0 40px rgba(0,229,255,.55),inset 0 0 50px rgba(0,229,255,.2)}
+.capImg{position:relative;margin:clamp(30px,4.4vh,44px) 14px 0;aspect-ratio:16/10;border-radius:8px;overflow:hidden;border:1px solid rgba(0,229,255,.45);background:#02121a}
+.capImg img{width:100%;height:100%;object-fit:cover;display:block}
+.capImg::after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,229,255,.06) 0 1px,transparent 1px 3px)}
+.badge{position:absolute;left:6px;bottom:6px;z-index:1;padding:2px 8px;font:400 9.5px 'Share Tech Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#bffcff;background:rgba(2,16,22,.85);border:1px solid rgba(0,229,255,.55);border-radius:3px}
+.capInfo{flex:1;display:flex;flex-direction:column;gap:7px;padding:14px 16px 18px}
+.capInfo .tag{margin:0;font:400 10.5px 'Share Tech Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--cy)}
+.capInfo h3{margin:0;font:800 clamp(17px,1.7vw,21px)/1.15 'Orbitron','Segoe UI',sans-serif;color:#eaffff;letter-spacing:.03em}
+.capInfo .short{margin:0;font:500 15px/1.35 'Rajdhani',sans-serif;color:var(--ink)}
+.hl{list-style:none;display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 0;padding:0}
+.hl li{padding:2px 9px;font:400 11.5px 'Share Tech Mono',monospace;color:#d9fbff;border:1px solid rgba(0,229,255,.45);background:rgba(0,229,255,.08);border-radius:3px}
+.capLinks{margin-top:auto;padding-top:10px;display:flex;flex-wrap:wrap;gap:8px}
+.capLinks .mini{padding:.5em 1em;font-size:.72rem}
+.mini.solid{background:var(--cy);color:#02171c;text-shadow:none}
+.mini.solid:hover{background:#7cf3ff}
+.mini.ghost{border-color:rgba(0,229,255,.45);color:var(--ink2)}
+.capBase{height:16px;margin:0 6%;border-radius:0 0 12px 12px;background:linear-gradient(180deg,#10222a,#1b343d);border:1px solid rgba(0,229,255,.5);border-top:0}
+.capBase::after{content:'';display:block;height:40px;margin:14px -18% 0;background:radial-gradient(ellipse at 50% 0,rgba(0,229,255,.38),transparent 70%);pointer-events:none}
+/* glass doors */
+.shell{position:absolute;inset:0;pointer-events:none;z-index:3}
+.shell i{position:absolute;top:0;bottom:0;width:50%;transition:transform .75s cubic-bezier(.6,0,.2,1);
+  background:linear-gradient(115deg,rgba(255,255,255,.1),rgba(0,229,255,.05) 40%,rgba(255,255,255,.02))}
+.shell .gl{left:0;border-right:1px solid rgba(160,250,255,.28)}
+.shell .gr{right:0;border-left:1px solid rgba(160,250,255,.28)}
+.cap.opening .gl{transform:translateX(-101%)}
+.cap.opening .gr{transform:translateX(101%)}
+.cap.opening .tube{box-shadow:0 0 70px 12px rgba(0,229,255,.85),inset 0 0 60px rgba(160,255,255,.5);border-color:#bffcff}
+.cap.opening .capTop .led{background:#fff}
+
+/* ---------- Project window ---------- */
+#projModal{position:fixed;inset:0;z-index:150;display:flex;align-items:center;justify-content:center;padding:clamp(8px,3vw,28px);
+  background:rgba(1,6,9,.82);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:0;transition:opacity .35s;font-family:'Rajdhani','Segoe UI',sans-serif;color:var(--ink)}
+#projModal.hidden{display:none}
+#projModal.show{opacity:1}
+.pm{position:relative;width:min(1000px,100%);max-height:100%;overflow:auto;border:1px solid rgba(0,229,255,.7);border-radius:8px;
+  background:linear-gradient(180deg,rgba(4,22,30,.97),rgba(2,10,14,.98));box-shadow:0 0 50px rgba(0,229,255,.35),inset 0 0 60px rgba(0,229,255,.06);
+  padding:clamp(16px,3vw,30px);transform:translateY(18px) scale(.98);transition:transform .45s cubic-bezier(.2,.8,.2,1);scrollbar-width:thin;scrollbar-color:#00b8d4 transparent}
+#projModal.show .pm{transform:none}
+.pmHead .eyebrow{margin:0 0 6px;font-size:11px}
+.pmHead h2{margin:0;font:800 clamp(22px,3.4vw,34px)/1.15 'Orbitron','Segoe UI',sans-serif;color:#eaffff;text-shadow:0 0 16px rgba(0,229,255,.45)}
+.pmHead p.sub{margin:6px 0 0;color:var(--ink2);font-size:15px}
+.pmX{position:absolute;top:12px;right:12px;width:36px;height:36px;border:1px solid rgba(0,229,255,.6);border-radius:4px;background:rgba(2,16,22,.8);color:var(--cy);font:400 18px/1 'Share Tech Mono',monospace;cursor:pointer}
+.pmX:hover{background:rgba(0,229,255,.2)}
+.pmTop{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;margin-top:18px}
+.pmShot{position:relative;border:1px solid rgba(0,229,255,.5);border-radius:6px;overflow:hidden;align-self:start;background:#02121a}
+.pmShot img{width:100%;display:block}
+.pmShot .badge{left:10px;bottom:10px;font-size:10.5px;padding:4px 10px}
+.pmBox{border:1px solid rgba(0,229,255,.4);border-radius:6px;background:rgba(0,229,255,.05);padding:14px}
+.metric{display:flex;justify-content:space-between;gap:12px;padding:8px 10px;margin-bottom:6px;border:1px solid rgba(0,229,255,.25);border-radius:3px;background:rgba(0,0,0,.25)}
+.metric span{font:400 11px 'Share Tech Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2);align-self:center}
+.metric b{font:700 12.5px 'Orbitron','Segoe UI',sans-serif;letter-spacing:.04em;color:#eaffff;text-align:right;text-transform:uppercase}
+.pmBtns{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.pmBtns .mini{display:block;text-align:center;padding:.85em 1em;font-size:.74rem}
+.pmNote{margin:10px 0 0;font:400 12px/1.4 'Share Tech Mono',monospace;color:var(--ink2);text-align:center}
+.pm h4{margin:22px 0 8px;font:400 12px 'Share Tech Mono',monospace;letter-spacing:.22em;text-transform:uppercase;color:var(--cy);text-shadow:0 0 8px rgba(0,229,255,.5)}
+.pm p{margin:0;font-size:16px;line-height:1.5}
+.pmTwo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+.pmTwo .pmBox h4{margin-top:0}
+.pmTwo .warn{border-color:rgba(255,170,60,.55);background:rgba(255,170,60,.06)}
+.pmTwo .warn h4{color:#ffb454;text-shadow:none}
+.pm ul.pmList{margin:0;padding:0;list-style:none}
+.pm ul.pmList li{position:relative;padding:3px 0 3px 18px;font-size:15.5px;line-height:1.4}
+.pm ul.pmList li::before{content:'';position:absolute;left:2px;top:.72em;width:7px;height:7px;border-radius:50%;background:var(--cy);box-shadow:0 0 8px var(--cy)}
+.pm ul.ok li::before{content:'✓';background:none;box-shadow:none;color:#4ff0a2;top:3px;font-size:13px;width:auto;height:auto}
+.pm .chips{margin-top:2px}
+.code{margin-top:6px;border:1px solid rgba(0,229,255,.4);border-radius:6px;background:#010608;overflow:hidden}
+.codeBar{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid rgba(0,229,255,.25);font:400 11px 'Share Tech Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
+.codeBar .mini{padding:.3em .8em;font-size:.66rem}
+.code pre{margin:0;padding:14px;overflow:auto;font:400 12.5px/1.55 'Share Tech Mono',ui-monospace,monospace;color:#bff6ff;max-height:300px;tab-size:2}
+.pmFoot{margin-top:22px;padding-top:12px;border-top:1px solid rgba(0,229,255,.25);display:flex;justify-content:space-between;gap:10px;font:400 10.5px 'Share Tech Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
+
+/* ---------- Contact ---------- */
+#contact{min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:clamp(40px,7vh,80px) clamp(16px,4vw,64px) 24px}
+#contact .secBg{object-position:28% 50%}
+.contactShade{background:linear-gradient(180deg,#02070a 0,rgba(2,7,10,.2) 20%,rgba(2,7,10,.2) 80%,#02070a 100%),linear-gradient(90deg,rgba(2,7,10,0) 30%,rgba(2,7,10,.55) 100%)}
+#contactPanel{position:relative;z-index:2;margin-left:auto;width:min(600px,100%);border:1px solid rgba(0,229,255,.6);border-radius:8px;padding:clamp(16px,2.4vw,26px);
+  background:rgba(2,14,20,.78);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 0 36px rgba(0,229,255,.28),inset 0 0 50px rgba(0,229,255,.06);
+  opacity:0;transform:translateY(28px);transition:opacity .8s,transform .8s cubic-bezier(.2,.7,.2,1)}
+#contactPanel.in{opacity:1;transform:none}
+.cpHead{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.cpHead h2{margin:0;font:800 clamp(19px,2.4vw,26px)/1.1 'Orbitron','Segoe UI',sans-serif;letter-spacing:.04em;color:#eaffff;text-shadow:0 0 16px rgba(0,229,255,.5)}
+.cpHead .tagc{font:400 11px 'Share Tech Mono',monospace;letter-spacing:.14em;color:var(--cy);border:1px solid rgba(0,229,255,.5);border-radius:3px;padding:3px 9px;text-transform:uppercase}
+.cGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cCard{border:1px solid rgba(0,229,255,.35);border-radius:6px;background:rgba(0,229,255,.05);padding:10px 12px;min-width:0}
+.cCard h3{margin:0 0 2px;font:700 11.5px 'Orbitron','Segoe UI',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#eaffff}
+.cCard .val{margin:6px 0 8px;padding:7px 9px;border:1px solid rgba(0,229,255,.25);border-radius:3px;background:rgba(0,0,0,.28);font:400 12.5px 'Share Tech Mono',monospace;color:#d9fbff;overflow-wrap:anywhere}
+.cCard .acts{display:flex;gap:6px}
+.cCard .acts .mini{flex:1;text-align:center;padding:.55em .4em;font-size:.66rem}
+form.cForm{margin-top:14px;border:1px solid rgba(0,229,255,.35);border-radius:6px;background:rgba(0,229,255,.04);padding:12px}
+form.cForm h3{margin:0 0 2px;font:700 12px 'Orbitron','Segoe UI',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#eaffff}
+.cForm .sub{margin:0 0 10px;font-size:13.5px;color:var(--ink2)}
+.cForm .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cForm label{display:block;margin:0 0 8px;font:400 10.5px 'Share Tech Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2)}
+.cForm input,.cForm textarea{display:block;width:100%;margin-top:4px;padding:9px 10px;border:1px solid rgba(0,229,255,.35);border-radius:3px;background:rgba(0,0,0,.35);color:#eaffff;font:500 15px 'Rajdhani',sans-serif;letter-spacing:.02em}
+.cForm textarea{min-height:92px;resize:vertical}
+.cForm input:focus,.cForm textarea:focus{outline:none;border-color:var(--cy);box-shadow:0 0 12px rgba(0,229,255,.4)}
+.cForm .hp{position:absolute;left:-9999px;opacity:0;height:0;width:0}
+.cForm button[type=submit]{width:100%;margin-top:2px;padding:12px;font:700 13px 'Orbitron','Segoe UI',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#02171c;background:var(--cy);border:0;border-radius:4px;cursor:pointer;box-shadow:0 0 18px rgba(0,229,255,.5)}
+.cForm button[type=submit]:hover{background:#7cf3ff}
+.cForm button[disabled]{opacity:.6;cursor:wait}
+.cStatus{min-height:1.4em;margin:8px 0 0;font:400 12.5px/1.4 'Share Tech Mono',monospace;color:var(--ink2)}
+.cStatus.ok{color:#4ff0a2}.cStatus.err{color:#ff8a8a}
+.cMeta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px;font:400 10.5px 'Share Tech Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}
+#siteFoot{position:relative;z-index:2;margin:26px 0 0;text-align:center;font:400 11px 'Share Tech Mono',monospace;letter-spacing:.2em;color:#5f9aa6}
+
+/* ---------- phones ---------- */
+[data-mode=mobile] #capsules{justify-content:flex-start;padding-top:64px}
+[data-mode=mobile] .capTrack{justify-content:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding:6px 11vw 22px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+[data-mode=mobile] .capTrack::-webkit-scrollbar{display:none}
+[data-mode=mobile] .cap{flex:0 0 78vw;max-width:none;scroll-snap-align:center}
+[data-mode=mobile] .pmTop,[data-mode=mobile] .pmTwo{grid-template-columns:1fr}
+[data-mode=mobile] .pm p{font-size:15px}
+[data-mode=mobile] .pmFoot{flex-direction:column;gap:4px}
+[data-mode=mobile] #contact{justify-content:flex-start;padding:128vw 12px 20px}
+[data-mode=mobile] #contact .secBg{height:auto;inset:0 0 auto 0;object-fit:initial;mask-image:linear-gradient(180deg,#000 62%,transparent 100%);-webkit-mask-image:linear-gradient(180deg,#000 62%,transparent 100%)}
+[data-mode=mobile] .contactShade{background:linear-gradient(180deg,rgba(2,7,10,.5) 0,rgba(2,7,10,0) 14%)}
+[data-mode=mobile] #contactPanel{margin:0 auto}
+[data-mode=mobile] .cGrid{grid-template-columns:1fr 1fr;gap:8px}
+[data-mode=mobile] .cCard{padding:9px 9px}
+[data-mode=mobile] .cCard .val{font-size:11px}
+[data-mode=mobile] .cForm .two{grid-template-columns:1fr}
+
+@media (prefers-reduced-motion:reduce){.cap,#contactPanel{transition:none;opacity:1;transform:none}.capTop .led,#scrollCue i{animation:none}.shell i{transition:none}}
+
+/* ================= Hologram cards ================= */
+#hubPanel{border-radius:4px;background:linear-gradient(160deg,rgba(2,22,30,.8),rgba(2,12,18,.86))}
+#hubPanel.glow{box-shadow:0 0 36px rgba(0,229,255,.55),inset 0 0 60px rgba(0,229,255,.16)}
+#hubHead{position:relative;z-index:1;flex:none;padding:3.4cqw 4.6cqw 0}
+.pgNo{position:absolute;right:4.6cqw;top:3.4cqw;font:400 clamp(8px,2.3cqw,12px) 'Share Tech Mono',monospace;letter-spacing:.16em;color:#6fb4c0}
+.pgTitle{margin:0;font:800 clamp(13px,5.4cqw,26px)/1.1 'Orbitron','Segoe UI',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#eaffff;
+  text-shadow:0 0 12px rgba(0,229,255,.9),0 0 26px rgba(0,229,255,.5)}
+.pgSub{display:block;margin-top:.5em;font:400 clamp(8px,2.2cqw,12px) 'Share Tech Mono',monospace;letter-spacing:.24em;text-transform:uppercase;color:var(--cy)}
+.pgRule{display:block;height:2px;margin-top:.7em;background:linear-gradient(90deg,var(--cy),rgba(0,229,255,.15) 70%,transparent);box-shadow:0 0 10px rgba(0,229,255,.8)}
+#hubBody{display:flex;flex-direction:column;overflow:hidden;padding:3cqw 4.6cqw;line-height:1.42;font-size:15px}
+.pg{margin:auto 0;width:100%}
+.pg.center{text-align:center;display:flex;flex-direction:column;align-items:center}
+@keyframes slideR{from{opacity:0;transform:translateX(18px);filter:brightness(1.8)}to{opacity:1;transform:none;filter:none}}
+@keyframes slideL{from{opacity:0;transform:translateX(-18px);filter:brightness(1.8)}to{opacity:1;transform:none;filter:none}}
+#hubBody p{margin:0 0 .65em}
+.pg .lbl{font-size:.82em;margin:0 0 .45em}
+.pg .lbl:not(:first-child){margin-top:1.1em}
+.chip{font-size:.92em}
+.deg{margin:0;font:700 1.08em/1.25 'Orbitron','Segoe UI',sans-serif;color:#eaffff;letter-spacing:.03em}
+.school{margin:.25em 0 .7em;color:var(--cy);font-size:.95em}
+.prog{margin:.4em 0 .8em;padding:.7em .8em;border:1px solid rgba(0,229,255,.35);border-radius:4px;background:rgba(0,0,0,.25)}
+.progTop,.progBot{display:flex;justify-content:space-between;gap:.6em;align-items:center;font:400 .78em 'Share Tech Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.progTop b{color:var(--cy);font-weight:400}
+.bar{height:.6em;margin:.5em 0;border-radius:1em;background:rgba(0,229,255,.12);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:1em;background:linear-gradient(90deg,#00b8d4,#7cf3ff);box-shadow:0 0 10px var(--cy)}
+.progBot em{font-style:normal;padding:.1em .6em;border:1px solid rgba(79,240,162,.6);border-radius:3px;color:#4ff0a2}
+.tool{display:flex;flex-direction:column;padding:.4em .7em;margin:0 0 .4em;border:1px solid rgba(0,229,255,.3);border-left:3px solid var(--cy);border-radius:3px;background:rgba(0,229,255,.05)}
+.tool b{font:700 .92em 'Orbitron','Segoe UI',sans-serif;letter-spacing:.04em;color:#eaffff}
+.tool span{font-size:.86em;color:var(--ink2)}
+.toolNote{margin:.6em 0 0!important;font:400 .8em/1.4 'Share Tech Mono',monospace;color:#bff6ff}
+.cert{margin:0 0 .6em;padding:.7em .8em;border:1px solid rgba(0,229,255,.35);border-radius:4px;background:rgba(0,229,255,.05)}
+.certTop{display:flex;justify-content:space-between;gap:.6em;align-items:flex-start}
+.certTop b{font:700 .92em/1.25 'Orbitron','Segoe UI',sans-serif;color:#eaffff;letter-spacing:.02em}
+.ver{flex:none;padding:.05em .6em;font:400 .7em 'Share Tech Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:#4ff0a2;border:1px solid rgba(79,240,162,.6);border-radius:3px}
+.org{margin:.2em 0 .4em;font:400 .78em 'Share Tech Mono',monospace;color:var(--cy)}
+.cert p{margin:0!important;font-size:.92em;color:var(--ink)}
+#hubPanel.glow .chip{border-color:var(--cy);background:rgba(0,229,255,.16);box-shadow:0 0 10px rgba(0,229,255,.35)}
+
+/* philosophy */
+.heart{width:2.8em;height:2.8em;padding:.6em;margin:0 0 .6em;color:#ff6b8b;border:1px solid rgba(0,229,255,.6);border-radius:.6em;background:rgba(0,229,255,.08);
+  box-shadow:0 0 18px rgba(0,229,255,.45);filter:drop-shadow(0 0 6px rgba(255,107,139,.7));animation:beat 1.8s ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1)}12%{transform:scale(1.1)}24%{transform:scale(1)}}
+.quote{position:relative;margin:.1em 0 .6em;padding:0 .3em;border:0;font:800 1.32em/1.28 'Orbitron','Segoe UI',sans-serif;color:#eaffff;text-shadow:0 0 14px var(--cy),0 0 30px rgba(0,229,255,.55)}
+.quote::before,.quote::after{color:var(--cy);opacity:.75;font-size:1.4em;line-height:0;vertical-align:-.3em}
+.quote::before{content:'\201C'}.quote::after{content:'\201D'}
+.phText{max-width:34em;color:var(--ink)}
+.note{margin:.4em 0 0;padding:.65em .8em;border:1px solid rgba(0,229,255,.5);border-radius:5px;background:rgba(0,229,255,.09);font:400 .84em/1.5 'Share Tech Mono',monospace;color:#d9fbff;box-shadow:inset 0 0 18px rgba(0,229,255,.12)}
+
+/* card navigation */
+#hubNavBar{position:relative;z-index:2;flex:none;display:flex;align-items:center;gap:2.4cqw;padding:2.2cqw 4cqw 3cqw;border-top:1px solid rgba(0,229,255,.22)}
+#hubDots{flex:1;display:flex;gap:1.6cqw;flex-wrap:wrap;min-width:0}
+#hubDots button{width:2cqw;height:2cqw;min-width:6px;min-height:6px;padding:0;border-radius:50%;border:1px solid rgba(0,229,255,.7);background:transparent;cursor:pointer}
+#hubDots button.on{background:var(--cy);box-shadow:0 0 8px var(--cy);transform:scale(1.25)}
+#hubPrev{width:7cqw;height:7cqw;min-width:24px;min-height:24px;border-radius:50%;border:1px solid rgba(0,229,255,.5);background:rgba(0,229,255,.06);color:var(--cy);font:700 16px/1 'Rajdhani',sans-serif;cursor:pointer}
+#hubNext{display:flex;align-items:center;gap:.5em;padding:.5em 1.1em .5em 1.3em;font:700 clamp(9px,3.2cqw,13px) 'Orbitron','Segoe UI',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#02171c;
+  background:linear-gradient(135deg,#7cf3ff,#00e5ff);border:0;border-radius:30px;cursor:pointer;box-shadow:0 0 14px rgba(0,229,255,.9),0 0 30px rgba(0,229,255,.5);animation:nextGlow 1.8s ease-in-out infinite;-webkit-tap-highlight-color:transparent}
+#hubNext i{font:700 1.5em/.7 'Rajdhani',sans-serif;font-style:normal}
+#hubNext.last i{transform:rotate(90deg)}
+@keyframes nextGlow{50%{box-shadow:0 0 22px rgba(0,229,255,1),0 0 48px rgba(0,229,255,.8)}}
+#hubNext:focus-visible,#hubPrev:focus-visible,#hubDots button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+#hubResume{position:absolute;z-index:5;top:calc(14px + env(safe-area-inset-top,0px));right:14px;padding:7px 14px;font:700 11px 'Orbitron','Segoe UI',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--cy);text-decoration:none;
+  background:rgba(2,16,22,.7);border:1px solid rgba(0,229,255,.6);border-radius:4px;box-shadow:0 0 14px rgba(0,229,255,.35)}
+#hubResume:hover{background:rgba(0,229,255,.2)}
+
+/* ---------- phone capsule: tall pod ---------- */
+[data-mode=mobile] .cap{flex:0 0 74vw;min-height:66svh}
+[data-mode=mobile] .capTop{height:26px;margin:0 20%;border-radius:16px 16px 0 0;background:repeating-linear-gradient(90deg,#1c343d 0 8px,#28474f 8px 10px)}
+[data-mode=mobile] .tube{border-radius:46% 46% 36px 36px / 120px 120px 36px 36px;border-width:2px;
+  background:linear-gradient(90deg,rgba(0,229,255,.12),rgba(0,40,52,.5) 14%,rgba(2,16,22,.85) 60%,rgba(0,229,255,.1))}
+[data-mode=mobile] .tube::before{content:'';position:absolute;z-index:4;left:7%;top:11%;bottom:8%;width:4%;border-radius:10px;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,.05) 60%,transparent)}
+[data-mode=mobile] .capImg{margin:62px 18px 0;aspect-ratio:4/3}
+[data-mode=mobile] .capInfo{padding:14px 20px 22px}
+[data-mode=mobile] .capBase{height:22px;margin:0 2%;border-radius:0 0 18px 18px;background:repeating-linear-gradient(90deg,#1c343d 0 10px,#28474f 10px 12px)}
+
+/* swipe arrows (phones) */
+.capArrow{display:none;position:absolute;z-index:6;top:46%;width:40px;height:56px;padding:0;border:1px solid rgba(0,229,255,.8);background:rgba(2,16,22,.78);color:var(--cy);cursor:pointer;
+  box-shadow:0 0 16px rgba(0,229,255,.55);align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:opacity .3s}
+.capArrow svg{width:20px;height:28px}
+.capArrow.prev{left:0;border-radius:0 28px 28px 0;border-left:0}
+.capArrow.next{right:0;border-radius:28px 0 0 28px;border-right:0}
+.capArrow[disabled]{opacity:0;pointer-events:none}
+.capArrow.pulse svg{animation:nudge 1.1s ease-in-out infinite}
+.capArrow.prev.pulse svg{animation-name:nudgeL}
+@keyframes nudge{50%{transform:translateX(5px)}}
+@keyframes nudgeL{50%{transform:translateX(-5px)}}
+[data-mode=mobile] .capArrow{display:flex}
+.capDots{display:none;position:relative;z-index:2;justify-content:center;gap:8px;margin-top:6px}
+.capDots i{width:8px;height:8px;border-radius:50%;border:1px solid var(--cy);transition:all .3s}
+.capDots i.on{background:var(--cy);box-shadow:0 0 8px var(--cy);transform:scale(1.3)}
+[data-mode=mobile] .capDots{display:flex}
+
+/* contact toast */
+.toast{position:fixed;z-index:300;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);max-width:90vw;padding:10px 16px;font:400 13px/1.4 'Share Tech Mono',monospace;color:#d9fbff;
+  background:rgba(2,16,22,.95);border:1px solid var(--cy);border-radius:5px;box-shadow:0 0 20px rgba(0,229,255,.5);opacity:0;transition:opacity .3s,transform .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.cCard .acts .mini{white-space:nowrap}
+
+/* contact on phones: robot sits right at the top, no empty space */
+[data-mode=mobile] #contact{padding-top:86vw}
+[data-mode=mobile] #contact .secBg{inset:auto 0 auto 0;top:-46vw;height:auto;mask-image:linear-gradient(180deg,#000 54%,transparent 78%);-webkit-mask-image:linear-gradient(180deg,#000 54%,transparent 78%)}
+[data-mode=mobile] .contactShade{background:linear-gradient(180deg,#02070a 0,rgba(2,7,10,0) 9%)}
+
+.cCard.wide{grid-column:1/-1}
+.cCard.wide .val{display:inline-block;margin-right:8px}
+
+/* wide cards (desktop): use two columns so the text can stay large */
+.tools{display:block}
+.edu{display:block}
+@container (min-width:430px){
+  .tools{display:grid;grid-template-columns:1fr 1fr;gap:0 .7em}
+  .tools .tool,.tools .cert{margin:0 0 .5em}
+  .edu{display:grid;grid-template-columns:1.15fr 1fr;gap:1em;align-items:start}
+  .edu .prog{margin:0}
+  .toolNote{grid-column:1/-1}
+}
+
+/* ---------- phones: bigger, easier to read ---------- */
+[data-mode=mobile] #introText{gap:clamp(8px,1.6vh,14px);bottom:calc(7% + env(safe-area-inset-bottom,0px))}
+[data-mode=mobile] .eyebrow{font-size:clamp(12px,3.3vw,15px)}
+[data-mode=mobile] #introName{font-size:clamp(28px,9.2vw,44px);line-height:1.12}
+[data-mode=mobile] .role{font-size:clamp(14px,4vw,18px);letter-spacing:.1em}
+[data-mode=mobile] .line{font-size:clamp(16px,4.6vw,20px)}
+[data-mode=mobile] .holoBtn{font-size:clamp(13px,3.7vw,16px);padding:15px 30px;margin-top:6px}
+[data-mode=mobile] #robotBubble{font-size:13px}
+[data-mode=mobile] .pgTitle{font-size:clamp(15px,6.2cqw,26px)}
+[data-mode=mobile] #hubNext{font-size:clamp(10px,3.6cqw,13px);padding:.6em 1.2em .6em 1.4em}
+[data-mode=mobile] .capTop{height:30px}
+[data-mode=mobile] .capImg{margin:64px 16px 0}
+[data-mode=mobile] .capInfo{gap:12px;padding:16px 20px 24px}
+[data-mode=mobile] .capInfo .tag{font-size:12.5px}
+[data-mode=mobile] .capInfo h3{font-size:clamp(22px,6.6vw,28px)}
+[data-mode=mobile] .capInfo .short{font-size:clamp(17px,4.9vw,20px);line-height:1.4}
+[data-mode=mobile] .hl li{font-size:clamp(13px,3.7vw,15px);padding:4px 11px}
+[data-mode=mobile] .badge{font-size:11px}
+[data-mode=mobile] .capLinks{gap:10px;padding-top:14px}
+[data-mode=mobile] .capLinks .mini{font-size:clamp(.82rem,3.6vw,.95rem);padding:.8em 1.3em}
+[data-mode=mobile] .cap{min-height:62svh}
+[data-mode=mobile] .tube::before{opacity:.35;left:4%}
+
+/* ---------- Skip button ---------- */
+#skipBtn{position:fixed;z-index:120;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));padding:9px 16px;
+  font:700 12px 'Orbitron','Segoe UI',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#bffcff;background:rgba(2,16,22,.55);
+  border:1px solid rgba(0,229,255,.55);border-radius:30px;cursor:pointer;box-shadow:0 0 14px rgba(0,229,255,.3);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+  -webkit-tap-highlight-color:transparent;transition:background .2s,box-shadow .2s}
+#skipBtn span{font-size:.8em;letter-spacing:-.1em;margin-left:.3em}
+#skipBtn:hover{background:rgba(0,229,255,.2);box-shadow:0 0 22px rgba(0,229,255,.6)}
+#skipBtn:focus-visible{outline:2px solid #fff;outline-offset:3px}
+html[data-scene=hub] #skipBtn{display:none}
+html[data-scene=intro][data-mode=mobile] #skipBtn{bottom:auto;top:calc(14px + env(safe-area-inset-top,0px))}
+html[data-scene=switch] #skipBtn{display:none}

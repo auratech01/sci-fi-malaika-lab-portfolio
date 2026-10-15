@@ -1,0 +1,60 @@
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:"Segoe UI",system-ui,sans-serif}
+#stage{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;background:#000;overflow:hidden}
+
+#zoomLayer{position:absolute;inset:0;transform-origin:50% 50%}
+#doorVideo,#nextVideo,#nextVideo2{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+#nextVideo,#nextVideo2{z-index:6}
+
+/* Invisible click area – sits exactly on the video's OPEN panel */
+#openHotspot{position:absolute;z-index:3;background:transparent;border:0;outline:0;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;opacity:0}
+#openHotspot:focus-visible{opacity:1;outline:2px solid rgba(0,229,255,.8);outline-offset:3px}
+
+#blackout{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;z-index:4;transition:opacity .8s ease-in}
+#blackout.on{opacity:1}
+
+#labVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;z-index:2}
+
+/* Light switch (top right) */
+#lightBtn{position:absolute;z-index:8;top:calc(18px + env(safe-area-inset-top,0px));right:calc(18px + env(safe-area-inset-right,0px));
+  display:flex;align-items:center;gap:12px;padding:8px 10px 8px 14px;cursor:pointer;
+  background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.55);border-radius:40px;color:#00e5ff;
+  font-size:13px;letter-spacing:.2em;box-shadow:0 0 14px rgba(0,229,255,.3);opacity:0;transition:opacity .5s ease,box-shadow .4s;
+  -webkit-tap-highlight-color:transparent;animation:glow 2.2s ease-in-out infinite}
+#lightBtn.show{opacity:1}
+#lightBtn .track{position:relative;width:52px;height:28px;border-radius:20px;background:#06161b;border:1px solid rgba(0,229,255,.6);transition:background .35s,box-shadow .35s}
+#lightBtn .knob{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#2b5560;transition:transform .35s cubic-bezier(.3,1.4,.5,1),background .35s,box-shadow .35s}
+#lightBtn.on{animation:none}
+#lightBtn.on .track{background:rgba(0,229,255,.35);box-shadow:0 0 18px rgba(0,229,255,.8)}
+#lightBtn.on .knob{transform:translateX(24px);background:#eaffff;box-shadow:0 0 12px #fff}
+@keyframes glow{50%{box-shadow:0 0 26px rgba(0,229,255,.75)}}
+
+/* Hidden capsule button + arrow hint */
+#capsuleHotspot{position:absolute;z-index:7;background:transparent;border:0;outline:0;opacity:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#capsuleHotspot:focus-visible{opacity:1;outline:2px solid rgba(0,229,255,.8);outline-offset:3px}
+.arrowHint{position:absolute;z-index:7;display:flex;align-items:center;gap:6px;pointer-events:none;color:#00e5ff;
+  font-size:12px;letter-spacing:.16em;text-transform:uppercase;text-shadow:0 0 8px #00e5ff;opacity:0;transition:opacity .4s;
+  filter:drop-shadow(0 0 6px rgba(0,229,255,.9));transform:translate(-100%,-50%)}
+.arrowHint.show{opacity:1}
+.arrowHint svg{animation:nudge .8s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateX(9px)}}
+@media (prefers-reduced-motion:reduce){.arrowHint svg,#lightBtn{animation:none}}
+
+/* Final scene */
+#welcome{position:absolute;inset:0;z-index:9;pointer-events:none;opacity:0;transition:opacity .8s ease;
+  background:radial-gradient(ellipse at 50% 50%,rgba(0,8,12,.78) 0%,rgba(0,8,12,.55) 55%,rgba(0,8,12,.25) 100%)}
+#welcome.show{opacity:1}
+#circuit{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+#circuit path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+#circuit .trace{stroke:#00b8d4;opacity:.55}
+#circuit .letter{stroke:#00e5ff;filter:drop-shadow(0 0 5px #00e5ff)}
+#circuit .node{fill:#eaffff;opacity:0;transform-box:fill-box;transform-origin:center;transform:scale(.2);
+  transition:opacity .4s ease,transform .4s cubic-bezier(.3,1.6,.5,1);filter:drop-shadow(0 0 6px #00e5ff)}
+#circuit .node.on{opacity:1;transform:scale(1)}
+#welcome.done .trace{opacity:.18;transition:opacity 1.2s ease}
+#welcome.done .letter{animation:neon 2.6s ease-in-out infinite}
+@keyframes neon{50%{filter:drop-shadow(0 0 12px #00e5ff) drop-shadow(0 0 22px rgba(0,229,255,.6))}}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){#welcome.done .letter{animation:none}}
+.hidden{display:none!important}

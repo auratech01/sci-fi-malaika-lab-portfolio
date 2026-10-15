@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Malaika Fatima — CS Student, Aspiring AI &amp; Game Developer</title>
+<meta name="description" content="Portfolio of Malaika Fatima, a Computer Science student building AI, security and game projects. Project Sentinel, Jade Lantern and Birthday Experience.">
+<meta property="og:title" content="Malaika Fatima — Portfolio">
+<meta property="og:description" content="Computer Science student · Aspiring AI &amp; Game Developer">
+<meta name="theme-color" content="#02070a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=11">
+<link rel="stylesheet" href="hub.css?v=11">
+</head>
+<body>
+<main id="stage">
+
+  <!-- Scene 1: door video + zoom layer -->
+  <div id="zoomLayer">
+    <video id="doorVideo" playsinline webkit-playsinline preload="auto"></video>
+    <!-- Transparent hidden button placed exactly over the door's "OPEN" panel -->
+    <button id="openHotspot" type="button" aria-label="Open the door"></button>
+  </div>
+
+  <!-- Arrow hint for the door button (3 seconds after load) -->
+  <div id="doorArrow" class="arrowHint hidden" aria-hidden="true">
+    <svg viewBox="0 0 60 30" width="60" height="30"><path d="M2 15h46M36 4l13 11-13 11" fill="none" stroke="#00e5ff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+
+  <!-- Scene 2: lab video (plays after the light is switched on) -->
+  <video id="labVideo" class="hidden" playsinline webkit-playsinline preload="auto"></video>
+
+  <!-- Full black overlay (fades in at the end of the zoom, fades out when light is on) -->
+  <div id="blackout"></div>
+
+  <!-- Light switch, top right of the black screen -->
+  <button id="lightBtn" type="button" role="switch" aria-checked="false" aria-label="Turn on the light" class="hidden">
+    <span class="lbl" id="lightLbl">OFF</span>
+    <span class="track"><span class="knob"></span></span>
+  </button>
+
+  <!-- Hidden button over the capsule's small screen + 3-second arrow hint -->
+  <button id="capsuleHotspot" type="button" class="hidden" aria-label="Open the capsule"></button>
+  <div id="arrowHint" class="arrowHint hidden" aria-hidden="true">
+    <svg viewBox="0 0 60 30" width="60" height="30"><path d="M2 15h46M36 4l13 11-13 11" fill="none" stroke="#00e5ff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+
+  <!-- Scene 3: videos that play after the capsule is opened -->
+  <video id="nextVideo" class="hidden" playsinline webkit-playsinline preload="auto"></video>
+  <video id="nextVideo2" class="hidden" playsinline webkit-playsinline preload="auto"></video>
+
+  <!-- Final scene: circuit lines draw "WELCOME TO MY PORTFOLIO" -->
+  <section id="welcome" class="hidden" aria-label="Welcome to my portfolio">
+    <h1 class="sr-only">Welcome to my portfolio</h1>
+    <svg id="circuit" aria-hidden="true"></svg>
+  </section>
+
+  <!-- Scene 4: close-up intro -->
+  <section id="intro" class="scene hidden" aria-label="Introduction">
+    <div class="kb">
+      <img id="introImg" class="sceneImg" alt="">
+      <div id="eyeL" class="eye"></div><div id="eyeR" class="eye"></div>
+      <div id="beamBar"></div>
+    </div>
+    <div class="introScrim"></div>
+    <div id="introText">
+      <p class="eyebrow" id="introEyebrow">// SYSTEM ONLINE</p>
+      <h2 id="introName" aria-live="polite"></h2>
+      <p class="role" id="introRole"></p>
+      <p class="line" id="introLine"></p>
+      <button id="introBtn" class="holoBtn" type="button">Enter the lab &#9656;</button>
+    </div>
+  </section>
+
+</main>
+
+<button id="skipBtn" type="button" aria-label="Skip this scene">Skip <span>&#9656;&#9656;</span></button>
+
+<!-- Beam flash used by the transition (outside #stage so it survives the swap) -->
+<div id="flash"></div>
+
+<!-- The scrolling site: hologram hub -> project capsules -> contact -->
+<div id="site" class="hidden">
+
+  <section id="hub" aria-label="About me">
+    <img id="hubImg" alt="">
+    <div id="handGlow"></div>
+    <div id="robotBubble" aria-live="polite"><span></span></div>
+    <div id="hubPanel" tabindex="-1">
+      <header id="hubHead"></header>
+      <div id="hubBody" aria-live="polite"></div>
+      <footer id="hubNavBar">
+        <div id="hubDots"></div>
+        <button id="hubPrev" type="button" aria-label="Previous card">&#8249;</button>
+        <button id="hubNext" type="button"><span>Next</span><i>&#8250;</i></button>
+      </footer>
+    </div>
+    <a id="hubResume" class="hidden" href="#" target="_blank" rel="noopener">Resume (PDF)</a>
+    <button id="scrollCue" type="button" aria-label="Scroll down to projects"><span>Projects</span><i></i></button>
+  </section>
+
+  <section id="capsules" aria-label="Projects">
+    <img id="capBg" class="secBg" alt="">
+    <div class="secShade"></div>
+    <header class="secHead">
+      <p class="eyebrow">// PROJECT CAPSULES</p>
+      <h2>My Projects</h2>
+      <p class="hint" id="capHint">Open a capsule to see the full story.</p>
+    </header>
+    <div id="capTrack" class="capTrack"></div>
+  </section>
+
+  <section id="contact" aria-label="Contact">
+    <img id="contactBg" class="secBg" alt="">
+    <div class="secShade contactShade"></div>
+    <div id="contactPanel"></div>
+    <p class="foot" id="siteFoot"></p>
+  </section>
+</div>
+
+<!-- Project detail window (opens after a capsule opens) -->
+<div id="projModal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="pmName"></div>
+
+<script src="data.js?v=11"></script>
+<script src="script.js?v=11"></script>
+<script src="hub.js?v=11"></script>
+<script src="site.js?v=11"></script>
+</body>
+</html>

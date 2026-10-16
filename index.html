@@ -10,11 +10,17 @@
 <meta name="theme-color" content="#02070a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=11">
-<link rel="stylesheet" href="hub.css?v=11">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"></noscript>
+<link rel="stylesheet" href="style.css?v=12">
+<link rel="stylesheet" href="hub.css?v=12">
 </head>
 <body>
+<div id="loader" role="status" aria-live="polite">
+  <div class="ldTitle">INITIALIZING LAB</div>
+  <div class="ldBar"><i id="ldFill"></i></div>
+  <div class="ldPct" id="ldPct">0%</div>
+</div>
 <main id="stage">
 
   <!-- Scene 1: door video + zoom layer -->
@@ -123,9 +129,9 @@
 <!-- Project detail window (opens after a capsule opens) -->
 <div id="projModal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="pmName"></div>
 
-<script src="data.js?v=11"></script>
-<script src="script.js?v=11"></script>
-<script src="hub.js?v=11"></script>
-<script src="site.js?v=11"></script>
+<script src="data.js?v=12"></script>
+<script src="script.js?v=12"></script>
+<script src="hub.js?v=12"></script>
+<script src="site.js?v=12"></script>
 </body>
 </html>

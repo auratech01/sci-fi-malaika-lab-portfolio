@@ -37,10 +37,16 @@
      Videos are downloaded fully in the background as blobs; if that is not possible
      (e.g. file:// in some browsers) the normal video URL is used instead. */
   const blobCache = {};
-  function fetchBlob(src) {
+  function fetchBlob(src, onP) {
     if (!blobCache[src]) {
-      blobCache[src] = fetch(src).then(r => { if (!r.ok) throw 0; return r.blob(); })
-        .then(b => URL.createObjectURL(b)).catch(() => src);
+      blobCache[src] = fetch(src).then(async r => {
+        if (!r.ok) throw 0;
+        const total = +r.headers.get('content-length') || 0;
+        if (!r.body || !onP || !total) return r.blob();
+        const rd = r.body.getReader(), parts = []; let got = 0;
+        for (;;) { const { done, value } = await rd.read(); if (done) break; parts.push(value); got += value.length; onP(got / total); }
+        return new Blob(parts, { type: 'video/mp4' });
+      }).then(b => URL.createObjectURL(b)).catch(() => src);
     }
     return blobCache[src];
   }
@@ -110,12 +116,47 @@
     setTimeout(() => arrowEl.classList.add('hidden'), 450);
   }
 
+  /* ---------- FIRST-LOAD LOADER ----------
+     The door video is downloaded first (progress bar on screen); the door can only be opened once it is
+     ready. While the visitor watches the door, the lab + capsule videos and the images load quietly. */
+  const loader = $('loader'), ldFill = $('ldFill'), ldPct = $('ldPct');
+  let doorIsReady = false, loadTok = 0, introHandled = false;
+  function setLoader(p) {
+    const v = Math.max(0, Math.min(1, p));
+    ldFill.style.transform = `scaleX(${v})`;
+    ldPct.textContent = Math.round(v * 100) + '%';
+  }
+  function finishLoader() {
+    if (doorIsReady) return;
+    doorIsReady = true;
+    setLoader(1);
+    loader.classList.add('done');
+    setTimeout(() => loader.remove(), 700);
+    hot.classList.remove('wait');
+    if (!doorStarted && !introHandled) {
+      introHandled = true;
+      doorArrowTimer = setTimeout(() => { doorArrowTimer = flashArrow(doorArrow, hot, ARROW_MS); }, 500);
+    }
+  }
   function loadDoor() {
-    const d = DOOR[current];
-    door.src = d.src; door.poster = d.poster; door.load();
+    const d = DOOR[current], my = ++loadTok;
+    door.poster = d.poster;
     warmedMode = null; labReady = gasReady = null;
     layout();
+    if (!doorIsReady) {
+      hot.classList.add('wait'); setLoader(0);
+    }
+    fetchBlob(d.src, p => { if (my === loadTok && !doorIsReady) setLoader(p * 0.92); })
+      .then(url => { if (my !== loadTok) return; door.src = url; door.load(); return waitReady(door, 12000); })
+      .then(() => {
+        if (my !== loadTok) return;
+        finishLoader();
+        warmup();                                   // lab + capsule videos start downloading now
+        setTimeout(() => { const m = mode(); [INTRO_SRC[m], HUB_SRC[m]].forEach(x => { const i = new Image(); i.src = x; }); }, 400);
+      });
   }
+  const INTRO_SRC = { mobile: 'images/closeup9.webp', desktop: 'images/closeup16.webp' };
+  const HUB_SRC = { mobile: 'images/holo9.webp', desktop: 'images/holo16.webp' };
 
   addEventListener('resize', () => {
     if (!doorStarted) { const m = mode(); if (m !== current) { current = m; loadDoor(); return; } }
@@ -124,10 +165,9 @@
 
   /* ---- Scene 1: door ---- */
   let doorArrowTimer = null;
-  doorArrowTimer = setTimeout(() => { doorArrowTimer = flashArrow(doorArrow, hot, ARROW_MS); }, 600);
 
   hot.addEventListener('click', () => {
-    if (doorStarted) return;
+    if (doorStarted || !doorIsReady) return;
     doorStarted = true;
     clearTimeout(doorArrowTimer); hideArrow(doorArrow);
     hot.style.pointerEvents = 'none';
@@ -324,7 +364,7 @@
 
   /* ---------- SKIP: one scene at a time (like skipping cut-scenes in a game) ---------- */
   function skipDoor() {
-    doorStarted = true; zoomed = true;
+    doorStarted = true; zoomed = true; introHandled = true; finishLoader();
     clearTimeout(doorArrowTimer); hideArrow(doorArrow);
     hot.style.pointerEvents = 'none';
     try { door.pause(); } catch (e) {}

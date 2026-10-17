@@ -303,7 +303,7 @@
 
     // Letters are written one after another (left to right); each letter's circuit line
     // arrives at its start point just before the letter starts to draw.
-    const START = 0.8, STEP = 0.11, L_DUR = 0.9, T_DUR = 0.9;   // seconds  (total writing time ≈ 5 s)
+    const START = 0.4, STEP = 0.07, L_DUR = 0.7, T_DUR = 0.7;   // seconds  (total writing time ≈ 3.5 s)
     const nT = traces.length;
     all.forEach(([e, kind], i) => {
       const len = e.getTotalLength();
@@ -334,7 +334,7 @@
     buildWelcome(!reduce);
     requestAnimationFrame(() => welcome.classList.add('show'));
     // after the title has been written and held for a moment, move on to the close-up intro
-    setTimeout(() => window.startIntro && window.startIntro(), reduce ? 2500 : 8200);
+    setTimeout(() => window.startIntro && window.startIntro(), reduce ? 2000 : 5600);
   }
   let rsz; addEventListener('resize', () => { if (welcomeShown) { clearTimeout(rsz); rsz = setTimeout(() => buildWelcome(false), 150); } });
 

@@ -76,11 +76,11 @@ window.PORTFOLIO = {
       eyebrow: 'Desktop security application',
       subtitle: 'Real-Time Threat Monitoring & AI Code Auditing',
       short: 'Real-time threat monitoring with live ECG telemetry and AI code auditing.',
-      highlights: ['117 tests passing', '5 live detectors'],
+      highlights: ['120+ tests passing', '5 live detectors'],
       image: 'images/projects/sentinel.webp',
       status: 'Active development',
       live: '', source: '',
-      metrics: [['Tests', '117 Passing'], ['Detectors', '5 Live'], ['Experience', 'Live ECG Telemetry'], ['Design', 'Glassmorphism Cyber UI'], ['Stack', 'Python + HTML/CSS/JS']],
+      metrics: [['Tests', '120+ Passing'], ['Detectors', '5 Live'], ['Experience', 'Live ECG Telemetry'], ['Design', 'Glassmorphism Cyber UI'], ['Stack', 'Python + HTML/CSS/JS']],
       problem: 'Most desktop security tools hide what they do, or they fake their alerts. Students and everyday users get no clear, real-time view of their machine’s health, and they get no email warning when something suspicious happens.',
       challenge: 'Built a local Python monitoring engine that detects real events, not simulated ones. It checks the firewall state, sustained CPU/RAM overload, suspicious outbound connections, repeated failed logins and internet loss. It serves a modern HTML/CSS/JS interface through a secured local server, so the UI stays separate from the backend logic.',
       architecture: 'A multi-threaded Python backend runs the detectors. It talks over a token-protected local HTTP API (127.0.0.1 only) to a vanilla ES-module front end, which is shown in a native desktop window. Every detected event is logged to disk and emailed as a responsive, severity-based alert. An optional Google Gemini integration adds AI-assisted code auditing on top of an offline pattern-based scanner.',
@@ -91,7 +91,7 @@ window.PORTFOLIO = {
         'Secured the local API with a per-launch token, Host-header validation, a Content-Security-Policy and path-traversal-safe static serving.',
         'Implemented a 5-attempt login lockout that survives restarts, plus view-only Guest Mode enforced on the server.',
         'Added OTP password recovery with hashed codes, a 10-minute expiry, an attempt limit and rate limiting.',
-        'Wrote 117 automated unit tests covering the detectors, auth, recovery and the offline scanner.',
+        'Wrote 120+ automated unit tests covering the detectors, auth, recovery and the offline scanner.',
         'Rebuilt the UI from CustomTkinter into a responsive HTML/CSS/JS interface with particles and live telemetry graphs.'
       ],
       snippet: {

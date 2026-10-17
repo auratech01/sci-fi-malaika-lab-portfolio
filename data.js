@@ -63,7 +63,7 @@ window.PORTFOLIO = {
 
   certs: [
     { title: 'CPA: Programming Essentials in C++', org: 'Cisco Networking Academy · Jun 2024', note: 'C++ syntax, object-oriented concepts, logic building, data structures and foundational programming essentials.' },
-    { title: 'CCNA: Introduction to Networks (70 hrs)', org: 'Cisco Networking Academy / Virtual University · 2024', note: 'Fundamental networking concepts, IP addressing, packet protocols, network architecture and connectivity.' }
+    { title: 'CCNA: Introduction to Networks (70 hrs)', org: 'Cisco Networking Academy / Virtual University · Jun 2025', note: 'Fundamental networking concepts, IP addressing, packet protocols, network architecture and connectivity.' }
   ],
 
   /* Project capsules.

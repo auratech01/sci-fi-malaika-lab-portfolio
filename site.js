@@ -185,6 +185,12 @@
   const waDigits = String(C.whatsapp || '').replace(/\D/g, '');
   const short = u => String(u || '').replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
 
+  // value shown on the card: just the handle (full link stays on the button); e-mail may break after the @
+  const handle = u => short(u).split('/').filter(Boolean).pop() || short(u);
+  function emailNode(a) {
+    const [u, d] = String(a).split('@');
+    return d ? el('span', null, u + '@', document.createElement('wbr'), d) : a;
+  }
   function card(title, sub, value, acts, wide) {
     return el('div', { class: 'cCard' + (wide ? ' wide' : '') }, el('h3', null, title), el('div', { style: 'font:400 11px "Share Tech Mono",monospace;color:#8fd6e2' }, sub),
       el('div', { class: 'val' }, value), el('div', { class: 'acts' }, acts));
@@ -194,10 +200,10 @@
   function buildContact() {
     const panel = $('contactPanel');
     const cards = [];
-    if (C.email)    cards.push(card('Direct email', 'Inquiries & roles', C.email, [copyBtn(C.email), mailLink(C.email, 'Mail', 'mini solid')]));
+    if (C.email)    cards.push(card('Direct email', 'Inquiries & roles', emailNode(C.email), [copyBtn(C.email), mailLink(C.email, 'Mail', 'mini solid')]));
     if (waDigits)   cards.push(card('WhatsApp', 'Instant messaging', C.whatsapp, [copyBtn(C.whatsapp), ext('https://wa.me/' + waDigits, 'mini solid', 'Chat')]));
-    if (C.linkedin) cards.push(card('LinkedIn', 'Professional network', short(C.linkedin), [ext(C.linkedin, 'mini solid', 'Connect')]));
-    if (C.github)   cards.push(card('GitHub', 'Open source code', short(C.github), [ext(C.github, 'mini solid', 'Repositories')]));
+    if (C.linkedin) cards.push(card('LinkedIn', 'Professional network', handle(C.linkedin), [ext(C.linkedin, 'mini solid', 'Connect')]));
+    if (C.github)   cards.push(card('GitHub', 'Open source code', handle(C.github), [ext(C.github, 'mini solid', 'Repositories')]));
     if (C.resume) {
       const dl = el('a', { class: 'mini solid', href: C.resume, download: 'Malaika_Fatima_Resume.pdf' }, 'Download');
       cards.push(card('Resume', 'Curriculum vitae (PDF)', 'Malaika_Fatima_Resume.pdf', [dl, ext(C.resume, 'mini ghost', 'View / Print')], true));

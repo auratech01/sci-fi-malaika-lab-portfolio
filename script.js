@@ -74,6 +74,7 @@
     gasReady.then(() => NEXT_VIDEOS[current].forEach(fetchBlob));
   }
 
+  let labLive = false, labSkipped = false;
   let doorStarted = false, labStage = 0;   // labStage: 0 none, 1 playing, 2 ended (capsule button live)
   const mode = () => (innerWidth <= 768 || innerHeight > innerWidth) ? 'mobile' : 'desktop';
   let current = mode();
@@ -104,16 +105,26 @@
     arrowEl.style.top = (l.top - s.top + l.height / 2) + 'px';
   }
   const placeArrow = () => placeArrowAt(arrow, capHot);
-  // Show an arrow for `ms`, then fade it out
-  function flashArrow(arrowEl, hotEl, ms) {
+  // Show an arrow for `ms`, then fade it out. Timers are tracked so a skip can cancel them instantly.
+  const arrowTimers = new Set();
+  function flashArrow(arrowEl, hotEl, ms, scene) {
+    if (scene && document.documentElement.dataset.scene !== scene) return null;   // never show it in a later scene
     arrowEl.classList.remove('hidden');
     placeArrowAt(arrowEl, hotEl);
     requestAnimationFrame(() => arrowEl.classList.add('show'));
-    return setTimeout(() => hideArrow(arrowEl), ms);
+    const t = setTimeout(() => { arrowTimers.delete(t); hideArrow(arrowEl); }, ms);
+    arrowTimers.add(t);
+    return t;
   }
   function hideArrow(arrowEl) {
     arrowEl.classList.remove('show');
     setTimeout(() => arrowEl.classList.add('hidden'), 450);
+  }
+  // Skip / scene change: both arrows vanish at once and nothing can bring them back
+  function clearArrows() {
+    arrowTimers.forEach(clearTimeout); arrowTimers.clear();
+    clearTimeout(doorArrowTimer);
+    [doorArrow, arrow].forEach(a => { a.classList.remove('show'); a.classList.add('hidden'); });
   }
 
   /* ---------- FIRST-LOAD LOADER ----------
@@ -135,7 +146,7 @@
     hot.classList.remove('wait');
     if (!doorStarted && !introHandled) {
       introHandled = true;
-      doorArrowTimer = setTimeout(() => { doorArrowTimer = flashArrow(doorArrow, hot, ARROW_MS); }, 500);
+      doorArrowTimer = setTimeout(() => { if (!doorStarted) flashArrow(doorArrow, hot, ARROW_MS, 'door'); }, 500);
     }
   }
   function loadDoor() {
@@ -169,7 +180,7 @@
   hot.addEventListener('click', () => {
     if (doorStarted || !doorIsReady) return;
     doorStarted = true;
-    clearTimeout(doorArrowTimer); hideArrow(doorArrow);
+    clearArrows();
     hot.style.pointerEvents = 'none';
     door.currentTime = 0;
     door.play().catch(() => door.play());
@@ -219,8 +230,11 @@
       blackout.classList.remove('on');
       lightBtn.classList.remove('show');
       setTimeout(() => lightBtn.classList.add('hidden'), 700);
-      if (skip) { try { lab.currentTime = Math.max(0, (lab.duration || 0) - 0.05); } catch (e) {} labEnded(); }
-      else lab.play().catch(() => lab.play());
+      labLive = true;
+      if (skip || labSkipped) {                  // skipped before it started: show the last frame, no replay
+        try { lab.pause(); lab.currentTime = Math.max(0, (lab.duration || 0) - 0.05); } catch (e) {}
+        setTimeout(labEnded, 700);               // the capsule button/arrow only appear after the screen has faded in
+      } else lab.play().catch(() => lab.play());
     });
   }
 
@@ -231,7 +245,7 @@
     labStage = 2; setScene('capsule');
     placeBox(capHot, LAB[current]);
     capHot.classList.remove('hidden');
-    flashArrow(arrow, capHot, ARROW_MS);
+    flashArrow(arrow, capHot, ARROW_MS, 'capsule');
   }
 
 
@@ -327,7 +341,7 @@
 
   function showWelcome() {
     if (welcomeShown) return;
-    welcomeShown = true; setScene('welcome');
+    welcomeShown = true; setScene('welcome'); clearArrows();
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     welcome.classList.remove('hidden');          // must be visible BEFORE building, or the browser skips the animation
     void welcome.getBoundingClientRect();
@@ -358,14 +372,14 @@
   capHot.addEventListener('click', () => {
     if (labStage !== 2) return;
     labStage = 3; setScene('gas');
-    capHot.classList.add('hidden'); hideArrow(arrow);
+    capHot.classList.add('hidden'); clearArrows();
     playList([GAS[current], ...NEXT_VIDEOS[current]]);
   });
 
   /* ---------- SKIP: one scene at a time (like skipping cut-scenes in a game) ---------- */
   function skipDoor() {
     doorStarted = true; zoomed = true; introHandled = true; finishLoader();
-    clearTimeout(doorArrowTimer); hideArrow(doorArrow);
+    clearArrows();
     hot.style.pointerEvents = 'none';
     try { door.pause(); } catch (e) {}
     zoomLayer.style.transition = 'none'; zoomLayer.style.transform = `scale(${ZOOM_SCALE})`;
@@ -375,12 +389,14 @@
     setTimeout(() => { blackout.style.transition = ''; }, 60);
   }
   function skipLab() {
+    clearArrows();
+    if (!labLive) { labSkipped = true; return; }   // the lab video has not started yet: it will jump to its end by itself
     try { lab.pause(); lab.currentTime = Math.max(0, (lab.duration || 0) - 0.05); } catch (e) {}
     labEnded();
   }
   function skipGas() {
-    labStage = 3;
-    capHot.classList.add('hidden'); hideArrow(arrow);
+    labStage = 3; clearArrows();
+    capHot.classList.add('hidden');
     try { nextVid.pause(); nextVid2.pause(); } catch (e) {}
     showWelcome();
   }

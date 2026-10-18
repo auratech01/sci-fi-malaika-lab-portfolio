@@ -433,3 +433,19 @@ html[data-scene=switch] #skipBtn{display:none}
 .ldBar i{display:block;height:100%;width:100%;transform:scaleX(0);transform-origin:left;background:linear-gradient(90deg,#00b8d4,#7ff6ff);box-shadow:0 0 12px #00e5ff;transition:transform .25s ease-out}
 .ldPct{font-size:11px;letter-spacing:.2em;margin-top:8px;opacity:.8}
 #openHotspot.wait{pointer-events:none}
+
+/* ---- phone polish (v13) ---- */
+[data-mode=mobile] .pgTitle{font-size:clamp(14px,5.2cqw,24px);padding-right:14cqw}
+[data-mode=mobile] .cap{min-height:54svh}
+[data-mode=mobile] .capImg{margin:58px 14px 0}
+[data-mode=mobile] .capInfo{gap:9px;padding:12px 18px 18px}
+[data-mode=mobile] .capInfo .tag{font-size:11.5px}
+[data-mode=mobile] .capInfo h3{font-size:clamp(20px,5.8vw,25px)}
+[data-mode=mobile] .capInfo .short{font-size:clamp(15px,4.2vw,17.5px);line-height:1.38}
+[data-mode=mobile] .hl li{font-size:clamp(12px,3.4vw,13.5px);padding:3px 10px}
+[data-mode=mobile] .capLinks{padding-top:8px}
+[data-mode=mobile] .capLinks .mini{font-size:clamp(.78rem,3.3vw,.88rem);padding:.7em 1.2em}
+[data-mode=mobile] .shell .gl{border-right-color:rgba(160,250,255,.1)}
+[data-mode=mobile] .shell .gr{border-left-color:rgba(160,250,255,.1)}
+[data-mode=mobile] .cCard .val{font-size:10.5px;letter-spacing:0;padding:6px 7px}
+.cStatus:empty{display:none}

@@ -449,3 +449,6 @@ html[data-scene=switch] #skipBtn{display:none}
 [data-mode=mobile] .shell .gr{border-left-color:rgba(160,250,255,.1)}
 [data-mode=mobile] .cCard .val{font-size:10.5px;letter-spacing:0;padding:6px 7px}
 .cStatus:empty{display:none}
+
+/* ?clean = recording mode: no hint arrows, Skip button, loader bar or scroll cue */
+html.clean #skipBtn,html.clean #loader,html.clean .arrowHint,html.clean #scrollCue{display:none!important}

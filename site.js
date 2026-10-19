@@ -200,7 +200,7 @@
   function buildContact() {
     const panel = $('contactPanel');
     const cards = [];
-    if (C.email)    cards.push(card('Direct email', 'Inquiries & roles', emailNode(C.email), [copyBtn(C.email), mailLink(C.email, 'Mail', 'mini solid')]));
+    if (C.email)    cards.push(card('Direct email', 'Inquiries & roles', emailNode(C.email), [copyBtn(C.email), mailLink(C.email, 'Mail', 'mini solid')], !waDigits));
     if (waDigits)   cards.push(card('WhatsApp', 'Instant messaging', C.whatsapp, [copyBtn(C.whatsapp), ext('https://wa.me/' + waDigits, 'mini solid', 'Chat')]));
     if (C.linkedin) cards.push(card('LinkedIn', 'Professional network', handle(C.linkedin), [ext(C.linkedin, 'mini solid', 'Connect')]));
     if (C.github)   cards.push(card('GitHub', 'Open source code', handle(C.github), [ext(C.github, 'mini solid', 'Repositories')]));

@@ -207,7 +207,7 @@ class MemoryConfetti {
     email:    'auratech1101@gmail.com',
     github:   'https://github.com/auratech01',
     linkedin: 'https://linkedin.com/in/auratech01',
-    whatsapp: '+92 322 6898750',
+    whatsapp: '',   // phone/WhatsApp deliberately not shown on the public site
     location: 'Pakistan (Virtual University)',
     availability: 'Available for internships, junior roles & collaborations',
     resume:   'Malaika_Fatima_Resume.pdf',   // your CV file (keep it in the same folder as index.html)

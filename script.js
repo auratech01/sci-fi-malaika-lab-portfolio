@@ -26,6 +26,9 @@
   const ZOOM_SCALE = 7, ZOOM_MS = 2400, ARROW_MS = 3000;   // lighter zoom = smooth even on slow PCs
   const ZOOM_LEAD = 0.9;   // seconds BEFORE the door video ends that the zoom starts (no pause feeling)
 
+  // Recording mode: open the site with ?clean at the end of the link. Hint arrows, Skip button and loader bar stay hidden.
+  const CLEAN = /[?&]clean\b/.test(location.search);
+  if (CLEAN) document.documentElement.classList.add('clean');
   const $ = id => document.getElementById(id);
   const setScene = n => { document.documentElement.dataset.scene = n; };
   setScene('door');
@@ -108,6 +111,7 @@
   // Show an arrow for `ms`, then fade it out. Timers are tracked so a skip can cancel them instantly.
   const arrowTimers = new Set();
   function flashArrow(arrowEl, hotEl, ms, scene) {
+    if (CLEAN) return null;
     if (scene && document.documentElement.dataset.scene !== scene) return null;   // never show it in a later scene
     arrowEl.classList.remove('hidden');
     placeArrowAt(arrowEl, hotEl);

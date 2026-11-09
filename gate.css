@@ -1,0 +1,69 @@
+/* ---------- "Who's visiting?" hologram gate (replaces the old loading bar) ---------- */
+#gate{position:fixed;inset:0;z-index:140;display:flex;align-items:center;justify-content:center;padding:max(14px,env(safe-area-inset-top,0px)) 14px max(14px,env(safe-area-inset-bottom,0px));
+  overflow:auto;color:var(--ink,#cfefff);font-family:'Rajdhani','Segoe UI',sans-serif;
+  background:radial-gradient(ellipse at 50% 55%,rgba(0,60,75,.55),rgba(2,9,13,.9) 60%,rgba(1,5,8,.96));
+  -webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);transition:opacity .7s ease,visibility .7s}
+#gate.done{opacity:0;visibility:hidden;pointer-events:none}
+.gateGrid{position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:linear-gradient(rgba(0,229,255,.07) 1px,transparent 1px) 0 0/44px 44px,linear-gradient(90deg,rgba(0,229,255,.07) 1px,transparent 1px) 0 0/44px 44px;
+  -webkit-mask-image:radial-gradient(ellipse at 50% 50%,#000 20%,transparent 72%);mask-image:radial-gradient(ellipse at 50% 50%,#000 20%,transparent 72%)}
+
+.gateHolo{position:relative;width:min(940px,100%);margin:auto;padding:clamp(22px,4.2vh,44px) clamp(16px,3.4vw,40px) clamp(26px,4.4vh,46px);text-align:center;
+  background:linear-gradient(180deg,rgba(0,229,255,.1),rgba(0,229,255,.03) 45%,rgba(0,229,255,.08));
+  border:1px solid rgba(0,229,255,.55);border-radius:6px;overflow:hidden;
+  box-shadow:0 0 40px rgba(0,229,255,.22),inset 0 0 60px rgba(0,229,255,.07);
+  animation:holoBoot 1.3s cubic-bezier(.2,.8,.2,1) both}
+@keyframes holoBoot{0%{opacity:0;transform:scaleY(.02);filter:brightness(3)}18%{opacity:1;transform:scaleY(.02) scaleX(.6)}38%{transform:scaleY(.02) scaleX(1)}
+  62%{transform:scaleY(1);filter:brightness(1.8)}72%{opacity:.55}80%{opacity:1}100%{opacity:1;transform:none;filter:none}}
+.gateHolo::before{content:'';position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:repeating-linear-gradient(0deg,rgba(0,229,255,.07) 0 1px,transparent 1px 4px);animation:scanDrift 6s linear infinite}
+@keyframes scanDrift{to{background-position:0 40px}}
+.gateScan{position:absolute;left:0;right:0;top:-30%;height:30%;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(127,246,255,.22),transparent);animation:scanSweep 5.5s ease-in-out 1.4s infinite}
+@keyframes scanSweep{0%{top:-30%}60%,100%{top:110%}}
+.gc{position:absolute;width:20px;height:20px;border:2px solid var(--cy,#00e5ff);filter:drop-shadow(0 0 5px #00e5ff)}
+.gc.tl{left:8px;top:8px;border-right:0;border-bottom:0}.gc.tr{right:8px;top:8px;border-left:0;border-bottom:0}
+.gc.bl{left:8px;bottom:8px;border-right:0;border-top:0}.gc.br{right:8px;bottom:8px;border-left:0;border-top:0}
+
+.gateEyebrow{position:relative;margin:0;font:400 13px 'Share Tech Mono',monospace;letter-spacing:.34em;color:var(--cy,#00e5ff);text-shadow:0 0 10px rgba(0,229,255,.7)}
+#gateTitle{position:relative;margin:.35em 0 .15em;font:800 clamp(26px,5vw,52px)/1.1 'Orbitron','Segoe UI',sans-serif;color:#eaffff;letter-spacing:.03em;
+  text-shadow:0 0 22px rgba(0,229,255,.6);animation:glitch 7s steps(1) 2s infinite}
+@keyframes glitch{0%,96%,100%{transform:none;text-shadow:0 0 22px rgba(0,229,255,.6)}97%{transform:translateX(-3px);text-shadow:3px 0 #ff3d71,-3px 0 #00e5ff}98%{transform:translateX(3px)}99%{transform:none}}
+.gateSub{position:relative;margin:0 0 clamp(16px,3vh,30px);font:500 clamp(15px,1.8vw,19px) 'Rajdhani',sans-serif;letter-spacing:.06em;color:var(--ink2,#8fd6e2)}
+
+.gateCards{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,1.6vw,20px)}
+.gateCard{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;padding:clamp(16px,3vh,28px) 14px clamp(14px,2.4vh,22px);cursor:pointer;color:inherit;font:inherit;
+  background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.4);border-radius:4px;-webkit-tap-highlight-color:transparent;
+  opacity:0;transform:translateY(14px);animation:cardIn .7s cubic-bezier(.2,.8,.2,1) forwards;transition:background .25s,box-shadow .25s,border-color .25s,transform .25s}
+.gateCard:nth-child(1){animation-delay:1.15s}.gateCard:nth-child(2){animation-delay:1.3s}.gateCard:nth-child(3){animation-delay:1.45s}
+@keyframes cardIn{to{opacity:1;transform:none}}
+.gateCard:hover,.gateCard:focus-visible{background:rgba(0,229,255,.16);border-color:#7ff6ff;box-shadow:0 0 28px rgba(0,229,255,.5),inset 0 0 26px rgba(0,229,255,.14);transform:translateY(-4px);outline:none}
+.gateCard:active{transform:translateY(-1px) scale(.99)}
+.gateCard svg{width:clamp(40px,6vw,58px);height:auto;fill:none;stroke:#7ff6ff;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 6px rgba(0,229,255,.8))}
+.gateCard b{font:700 clamp(15px,2vw,20px) 'Orbitron','Segoe UI',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#eaffff}
+.gateCard span{font:500 clamp(14px,1.5vw,17px)/1.35 'Rajdhani',sans-serif;color:var(--ink2,#8fd6e2);max-width:24ch}
+.gateCard em{margin-top:2px;font:400 11px 'Share Tech Mono',monospace;font-style:normal;letter-spacing:.22em;text-transform:uppercase;color:var(--cy,#00e5ff);
+  border:1px solid rgba(0,229,255,.45);border-radius:12px;padding:2px 10px}
+
+/* after "Viewer": the cards dissolve and a hologram ring shows the lab loading */
+.gateProg{display:none;position:relative;flex-direction:column;align-items:center;gap:8px;padding:6px 0 2px;font:400 13px 'Share Tech Mono',monospace;letter-spacing:.24em;color:#7ff6ff;text-transform:uppercase}
+#gate.loading .gateCards{display:none}
+#gate.loading .gateSub{display:none}
+#gate.loading .gateProg{display:flex}
+.gateProg svg{width:88px;height:88px;transform:rotate(-90deg);filter:drop-shadow(0 0 8px rgba(0,229,255,.8))}
+.gateProg circle{fill:none;stroke-width:2.4}
+.gateProg .rb{stroke:rgba(0,229,255,.2)}
+.gateProg .rf{stroke:#7ff6ff;stroke-linecap:round;stroke-dasharray:119.4;stroke-dashoffset:119.4;transition:stroke-dashoffset .3s ease-out}
+#gatePct{position:absolute;top:calc(6px + 44px - .6em);font:700 15px 'Orbitron',sans-serif;letter-spacing:.06em}
+.gateProgTxt{margin-top:2px;animation:pulseTxt 1.6s ease-in-out infinite}
+@keyframes pulseTxt{50%{opacity:.45}}
+
+/* phones: stacked cards */
+[data-mode=mobile] .gateCards{grid-template-columns:1fr;gap:10px}
+[data-mode=mobile] .gateCard{flex-direction:row;flex-wrap:wrap;justify-content:flex-start;text-align:left;gap:4px 14px;padding:12px 14px;align-items:center}
+[data-mode=mobile] .gateCard svg{width:44px;flex:none}
+[data-mode=mobile] .gateCard b{flex:1 1 40%}
+[data-mode=mobile] .gateCard span{flex:1 1 100%;max-width:none;margin-left:58px;margin-top:-16px}
+[data-mode=mobile] .gateCard em{position:absolute;right:12px;top:12px;margin:0}
+html.clean #gate{display:none}
+@media (prefers-reduced-motion:reduce){.gateHolo,.gateCard{animation:none;opacity:1;transform:none}.gateScan,.gateHolo::before,#gateTitle{animation:none}}

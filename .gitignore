@@ -1,0 +1,7 @@
+# Never commit secrets. The Gemini key lives ONLY in Cloudflare (Settings -> Variables and Secrets).
+.dev.vars
+.env
+.env.*
+*.key
+node_modules/
+.wrangler/

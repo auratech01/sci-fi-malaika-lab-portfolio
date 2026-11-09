@@ -1,0 +1,41 @@
+/* Ask AURA: chat panel (bottom-right). AURA herself perches on its top edge while it is open. */
+#cbPanel{display:none;position:fixed;z-index:148;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  width:min(380px,calc(100vw - 32px));height:min(540px,calc(100dvh - 120px));flex-direction:column;overflow:hidden;color:#d9fbff;
+  background:rgba(2,12,17,.95);border:1px solid rgba(0,229,255,.7);border-radius:10px;
+  box-shadow:0 0 34px rgba(0,229,255,.3),inset 0 0 40px rgba(0,229,255,.05);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  font-family:'Rajdhani','Segoe UI',sans-serif;transform-origin:100% 100%}
+#cbPanel.open{display:flex;animation:cbIn .35s cubic-bezier(.2,.9,.3,1.1)}
+@keyframes cbIn{from{opacity:0;transform:translateY(14px) scale(.94)}to{opacity:1;transform:none}}
+#cbPanel button:focus-visible,#cbInput:focus-visible{outline:2px solid #fff;outline-offset:2px}
+#cbHead{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px 11px 64px;border-bottom:1px solid rgba(0,229,255,.3)}
+#cbHead b{display:block;font:700 12px 'Orbitron','Segoe UI',sans-serif;letter-spacing:.18em;color:#00e5ff}
+#cbHead small{display:block;margin-top:3px;font:400 11px 'Share Tech Mono',monospace;color:#6fb4c0;letter-spacing:.05em}
+#cbClose{flex:none;width:30px;height:30px;border-radius:6px;border:1px solid rgba(0,229,255,.45);background:transparent;color:#bffcff;font-size:18px;line-height:1;cursor:pointer}
+#cbClose:hover{background:rgba(0,229,255,.18)}
+
+#cbLog{flex:1;min-height:0;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin;scrollbar-color:#00b8d4 transparent}
+.cbMsg{max-width:90%;padding:9px 12px;border-radius:8px;font-size:15.5px;line-height:1.38;overflow-wrap:anywhere}
+.cbMsg.bot{align-self:flex-start;background:rgba(0,229,255,.09);border:1px solid rgba(0,229,255,.28)}
+.cbMsg.user{align-self:flex-end;background:rgba(0,229,255,.28);border:1px solid rgba(0,229,255,.6);color:#fff}
+.cbMsg a{color:#7df3ff;text-decoration:underline;text-underline-offset:2px}
+.cbMsg strong{color:#fff}
+.cbAi{margin-top:7px;font:400 10.5px 'Share Tech Mono',monospace;letter-spacing:.08em;color:#6fb4c0}
+.cbSug{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.cbSug button{padding:5px 11px;border-radius:14px;border:1px solid rgba(0,229,255,.55);background:rgba(0,229,255,.07);color:#bffcff;cursor:pointer;
+  font:400 12px 'Share Tech Mono',monospace;text-align:left;transition:background .2s}
+.cbSug button:hover{background:rgba(0,229,255,.24)}
+.cbTyping{display:flex;gap:5px;padding:12px 14px}
+.cbTyping i{width:6px;height:6px;border-radius:50%;background:#00e5ff;opacity:.35;animation:cbDot 1s infinite}
+.cbTyping i:nth-child(2){animation-delay:.18s}.cbTyping i:nth-child(3){animation-delay:.36s}
+@keyframes cbDot{40%{opacity:1;transform:translateY(-3px)}}
+
+#cbForm{flex:none;display:flex;gap:8px;padding:10px 12px;border-top:1px solid rgba(0,229,255,.3)}
+#cbInput{flex:1;min-width:0;padding:9px 11px;border-radius:6px;border:1px solid rgba(0,229,255,.45);background:rgba(0,0,0,.35);color:#fff;font:400 16px 'Rajdhani','Segoe UI',sans-serif}
+#cbInput::placeholder{color:#5f9aa6}
+#cbSend{flex:none;padding:0 14px;border-radius:6px;border:1px solid rgba(0,229,255,.7);background:rgba(0,229,255,.18);color:#e8fdff;cursor:pointer;
+  font:700 11px 'Orbitron','Segoe UI',sans-serif;letter-spacing:.12em;text-transform:uppercase}
+#cbSend:hover{background:rgba(0,229,255,.36)}
+#cbSend:disabled{opacity:.5;cursor:default}
+
+[data-mode=mobile] #cbPanel{left:8px;right:8px;width:auto;bottom:calc(8px + env(safe-area-inset-bottom,0px));height:min(72svh,560px)}
+@media (prefers-reduced-motion:reduce){#cbPanel.open{animation:none}.cbTyping i{animation:none;opacity:.8}}

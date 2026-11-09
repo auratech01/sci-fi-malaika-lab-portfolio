@@ -147,6 +147,8 @@
     }, 720);
   }
 
+  window.openProjectByIndex = i => { const cap = document.querySelectorAll('#capTrack .cap')[i]; if (cap) openProject(i, cap); };
+
   function closeProject() {
     if (!openCap) return;
     modal.classList.remove('show');

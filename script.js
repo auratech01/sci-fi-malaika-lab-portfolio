@@ -23,6 +23,11 @@
   // mobile: ['videos/scene3_9.mp4'], desktop: ['videos/scene3_16.mp4']
   const NEXT_VIDEOS = { mobile: [], desktop: [] };
 
+  /* WebM (VP9) files are ~27% smaller at the same look. Safari / iPhone keep the MP4 files. */
+  const UA = navigator.userAgent;
+  const webkitOnly = /iP(hone|ad|od)/.test(UA) || (/Safari/.test(UA) && !/Chrome|Chromium|CriOS|FxiOS|Edg|Android/.test(UA));
+  let useWebm = !webkitOnly && !!document.createElement('video').canPlayType('video/webm; codecs="vp9,opus"');
+  const vsrc = p => (useWebm ? p.replace(/\.mp4$/, '.webm') : p);
   const ZOOM_SCALE = 7, ZOOM_MS = 2400, ARROW_MS = 3000;   // lighter zoom = smooth even on slow PCs
   const ZOOM_LEAD = 0.9;   // seconds BEFORE the door video ends that the zoom starts (no pause feeling)
 
@@ -30,11 +35,29 @@
   const CLEAN = /[?&]clean\b/.test(location.search);
   if (CLEAN) document.documentElement.classList.add('clean');
   const $ = id => document.getElementById(id);
-  const setScene = n => { document.documentElement.dataset.scene = n; };
+  const setScene = n => { if (document.documentElement.dataset.scene === 'hub') return; document.documentElement.dataset.scene = n; };
   setScene('door');
   const stage = $('stage'), zoomLayer = $('zoomLayer'), door = $('doorVideo'), hot = $('openHotspot'),
         blackout = $('blackout'), lightBtn = $('lightBtn'), lightLbl = $('lightLbl'), lab = $('labVideo'),
         nextVid2 = $('nextVideo2'), capHot = $('capsuleHotspot'), arrow = $('arrowHint'), doorArrow = $('doorArrow'), nextVid = $('nextVideo'), welcome = $('welcome'), circuit = $('circuit');
+
+  /* ---------- AUTOPLAY (no clicks needed) ----------
+     The videos have sound. If the browser refuses sound without a click, they play muted
+     and the sound switches on at the visitor's first tap / key press. */
+  let autoMuted = false;
+  const allVideos = () => [door, lab, nextVid, nextVid2];
+  function autoPlay(v) {
+    if (autoMuted) v.muted = true;
+    return v.play().catch(() => {
+      autoMuted = true; allVideos().forEach(x => { x.muted = true; });
+      return v.play().catch(() => {});
+    });
+  }
+  ['pointerdown', 'keydown', 'touchstart'].forEach(ev => addEventListener(ev, () => {
+    if (!autoMuted) return;
+    autoMuted = false; allVideos().forEach(x => { x.muted = false; });
+  }, { once: false, passive: true }));
+  let stopped = false;   // set when the visitor skips
 
   /* ---------- PRELOADING (so playback never stutters) ----------
      Videos are downloaded fully in the background as blobs; if that is not possible
@@ -48,7 +71,7 @@
         if (!r.body || !onP || !total) return r.blob();
         const rd = r.body.getReader(), parts = []; let got = 0;
         for (;;) { const { done, value } = await rd.read(); if (done) break; parts.push(value); got += value.length; onP(got / total); }
-        return new Blob(parts, { type: 'video/mp4' });
+        return new Blob(parts, { type: /\.webm$/.test(src) ? 'video/webm' : 'video/mp4' });
       }).then(b => URL.createObjectURL(b)).catch(() => src);
     }
     return blobCache[src];
@@ -62,8 +85,10 @@
     });
   }
   function prepare(video, src, poster) {
-    return fetchBlob(src).then(url => {
+    const want = vsrc(src);
+    return fetchBlob(want).then(url => {
       if (poster) video.poster = poster;
+      video.onerror = () => { if (want !== src) { video.onerror = null; useWebm = false; fetchBlob(src).then(u => { video.src = u; video.load(); }); } };
       video.src = url; video.load();
       return waitReady(video);
     });
@@ -134,25 +159,24 @@
   /* ---------- FIRST-LOAD LOADER ----------
      The door video is downloaded first (progress bar on screen); the door can only be opened once it is
      ready. While the visitor watches the door, the lab + capsule videos and the images load quietly. */
-  const loader = $('loader'), ldFill = $('ldFill'), ldPct = $('ldPct');
-  let doorIsReady = false, loadTok = 0, introHandled = false;
-  function setLoader(p) {
-    const v = Math.max(0, Math.min(1, p));
-    ldFill.style.transform = `scaleX(${v})`;
-    ldPct.textContent = Math.round(v * 100) + '%';
-  }
+  let doorIsReady = false, loadTok = 0, introHandled = false, viewerChosen = false, doorLoadStarted = false;
+  function setLoader(p) { window.Gate && window.Gate.progress(Math.max(0, Math.min(1, p))); }
   function finishLoader() {
     if (doorIsReady) return;
     doorIsReady = true;
     setLoader(1);
-    loader.classList.add('done');
-    setTimeout(() => loader.remove(), 700);
     hot.classList.remove('wait');
-    if (!doorStarted && !introHandled) {
-      introHandled = true;
-      doorArrowTimer = setTimeout(() => { if (!doorStarted) flashArrow(doorArrow, hot, ARROW_MS, 'door'); }, 500);
-    }
+    maybeBegin();
   }
+  /* The door only opens once the visitor picked "Viewer" at the gate AND the door video is ready. */
+  function maybeBegin() {
+    if (!viewerChosen || !doorIsReady || doorStarted || introHandled || stopped) return;
+    introHandled = true;
+    window.Gate && window.Gate.close();
+    setTimeout(openDoor, 900);                   // the door opens by itself, no button
+  }
+  window.preloadDoor = () => { if (doorLoadStarted || stopped) return; doorLoadStarted = true; loadDoor(); };
+  window.startViewer = () => { viewerChosen = true; window.preloadDoor(); maybeBegin(); };
   function loadDoor() {
     const d = DOOR[current], my = ++loadTok;
     door.poster = d.poster;
@@ -161,8 +185,9 @@
     if (!doorIsReady) {
       hot.classList.add('wait'); setLoader(0);
     }
-    fetchBlob(d.src, p => { if (my === loadTok && !doorIsReady) setLoader(p * 0.92); })
-      .then(url => { if (my !== loadTok) return; door.src = url; door.load(); return waitReady(door, 12000); })
+    door.onerror = () => { if (useWebm && my === loadTok) { door.onerror = null; useWebm = false; doorIsReady = false; loadDoor(); } };
+    fetchBlob(vsrc(d.src), p => { if (my === loadTok && !doorIsReady) setLoader(p * 0.92); })
+      .then(url => { if (my !== loadTok) return; door.src = url; door.load(); return waitReady(door, 8000); })
       .then(() => {
         if (my !== loadTok) return;
         finishLoader();
@@ -174,22 +199,27 @@
   const HUB_SRC = { mobile: 'images/holo9.webp', desktop: 'images/holo16.webp' };
 
   addEventListener('resize', () => {
-    if (!doorStarted) { const m = mode(); if (m !== current) { current = m; loadDoor(); return; } }
+    if (!doorStarted) {
+      const m = mode();
+      if (m !== current) { current = m; door.poster = DOOR[current].poster; if (doorLoadStarted) { loadDoor(); return; } }
+    }
     layout();
   });
+  door.poster = DOOR[current].poster;            // the door picture sits (blurred) behind the gate
 
   /* ---- Scene 1: door ---- */
   let doorArrowTimer = null;
 
-  hot.addEventListener('click', () => {
-    if (doorStarted || !doorIsReady) return;
+  function openDoor() {
+    if (stopped || doorStarted || !doorIsReady) return;
     doorStarted = true;
     clearArrows();
     hot.style.pointerEvents = 'none';
     door.currentTime = 0;
-    door.play().catch(() => door.play());
+    autoPlay(door);
     watchDoorEnd();
-  });
+  }
+  hot.addEventListener('click', openDoor);     // a click still works, but it is no longer needed
 
   // Zoom starts slightly BEFORE the door video ends, so the camera keeps moving (no pause)
   let zoomed = false;
@@ -200,10 +230,11 @@
     zoomLayer.style.transform = `scale(${ZOOM_SCALE})`;
     setTimeout(() => { if (labStage === 0) blackout.classList.add('on'); }, ZOOM_MS * 0.35);
     setTimeout(() => {
-      if (labStage !== 0 || lightBtn.classList.contains('show')) return;
+      if (stopped || labStage !== 0 || lightBtn.classList.contains('show')) return;
       lightBtn.classList.remove('hidden');
       requestAnimationFrame(() => lightBtn.classList.add('show'));
       setScene('switch');
+      setTimeout(() => { if (!stopped) lightOn(false); }, 1500);   // the switch flips by itself, no button
     }, ZOOM_MS * 0.5);          // switch fades in WHILE the screen goes dark: never an empty black screen
   }
   function watchDoorEnd() {
@@ -238,7 +269,7 @@
       if (skip || labSkipped) {                  // skipped before it started: show the last frame, no replay
         try { lab.pause(); lab.currentTime = Math.max(0, (lab.duration || 0) - 0.05); } catch (e) {}
         setTimeout(labEnded, 700);               // the capsule button/arrow only appear after the screen has faded in
-      } else lab.play().catch(() => lab.play());
+      } else autoPlay(lab);
     });
   }
 
@@ -249,7 +280,7 @@
     labStage = 2; setScene('capsule');
     placeBox(capHot, LAB[current]);
     capHot.classList.remove('hidden');
-    flashArrow(arrow, capHot, ARROW_MS, 'capsule');
+    setTimeout(openCapsule, 900);                // the capsule opens by itself, no button
   }
 
 
@@ -366,55 +397,32 @@
       await ready;
       v.style.zIndex = 6 + i;
       v.classList.remove('hidden');
-      v.play().catch(() => {});
+      autoPlay(v);
       const done = endedOnce(v);
       ready = i + 1 < list.length ? prepare(o, list[i + 1]) : null;   // preload the next one meanwhile
       await done;                                                      // last video stays on its final frame
     }
     showWelcome();                                                     // everything has ended -> circuit title
   }
-  capHot.addEventListener('click', () => {
-    if (labStage !== 2) return;
+  function openCapsule() {
+    if (stopped || labStage !== 2) return;
     labStage = 3; setScene('gas');
     capHot.classList.add('hidden'); clearArrows();
     playList([GAS[current], ...NEXT_VIDEOS[current]]);
-  });
+  }
+  capHot.addEventListener('click', openCapsule);
 
-  /* ---------- SKIP: one scene at a time (like skipping cut-scenes in a game) ---------- */
-  function skipDoor() {
-    doorStarted = true; zoomed = true; introHandled = true; finishLoader();
+  /* ---------- Recruiter / Client: leave the cinematic out completely ---------- */
+  window.__stopIntro = function () {
+    stopped = true;
+    doorStarted = true; zoomed = true; introHandled = true; labStage = 3; welcomeShown = true;
+    doorIsReady = true; doorLoadStarted = true;
+    welcomeTimers.forEach(clearTimeout); welcomeTimers = [];
     clearArrows();
     hot.style.pointerEvents = 'none';
-    try { door.pause(); } catch (e) {}
-    zoomLayer.style.transition = 'none'; zoomLayer.style.transform = `scale(${ZOOM_SCALE})`;
-    blackout.style.transition = 'none'; blackout.classList.add('on');
-    warmup();
-    lightOn(false);                           // the light switch is skipped together with the door: lab video starts
-    setTimeout(() => { blackout.style.transition = ''; }, 60);
-  }
-  function skipLab() {
-    clearArrows();
-    if (!labLive) { labSkipped = true; return; }   // the lab video has not started yet: it will jump to its end by itself
-    try { lab.pause(); lab.currentTime = Math.max(0, (lab.duration || 0) - 0.05); } catch (e) {}
-    labEnded();
-  }
-  function skipGas() {
-    labStage = 3; clearArrows();
     capHot.classList.add('hidden');
-    try { nextVid.pause(); nextVid2.pause(); } catch (e) {}
-    showWelcome();
-  }
-  $('skipBtn').addEventListener('click', () => {
-    switch (document.documentElement.dataset.scene) {
-      case 'door': skipDoor(); break;
-      case 'lab': skipLab(); break;
-      case 'capsule': case 'gas': skipGas(); break;
-      case 'welcome': window.startIntro && window.startIntro(); break;
-      case 'intro': $('introBtn').click(); break;
-    }
-  });
+    [door, lab, nextVid, nextVid2].forEach(v => { try { v.pause(); } catch (e) {} });
+  };
 
   door.addEventListener('canplaythrough', () => setTimeout(warmup, 300));
-  setTimeout(warmup, 2500);
-  loadDoor();
 })();

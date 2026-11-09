@@ -1,0 +1,12 @@
+# Optional: deploy the Worker from the command line instead of the Cloudflare dashboard.
+#   npm i -g wrangler && wrangler login
+#   wrangler secret put GEMINI_API_KEY      (paste your key when asked: it is stored in Cloudflare, not in this file)
+#   wrangler deploy
+name = "aura-portfolio-chat"
+main = "chatbot-worker.js"
+compatibility_date = "2025-01-01"
+
+# Recommended for reliable limits: create it with `wrangler kv namespace create aura-limits`, then paste the id here and uncomment.
+# [[kv_namespaces]]
+# binding = "CHAT_KV"
+# id = "PASTE_NAMESPACE_ID_HERE"

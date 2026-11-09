@@ -3,23 +3,50 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Malaika Fatima — CS Student, Aspiring AI &amp; Game Developer</title>
-<meta name="description" content="Portfolio of Malaika Fatima, a Computer Science student building AI, security and game projects. Project Sentinel, Jade Lantern and Birthday Experience.">
+<title>Malaika Fatima — CS Student, Aspiring AI Developer</title>
+<meta name="description" content="Portfolio of Malaika Fatima, a Computer Science student focused on AI, building AI-assisted security tools and interactive web projects. Project Sentinel, Jade Lantern and Birthday Experience.">
 <meta property="og:title" content="Malaika Fatima — Portfolio">
-<meta property="og:description" content="Computer Science student · Aspiring AI &amp; Game Developer">
+<meta property="og:description" content="Computer Science student · Aspiring AI Developer">
 <meta name="theme-color" content="#02070a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="style.css?v=13">
-<link rel="stylesheet" href="hub.css?v=13">
+<link rel="stylesheet" href="style.css?v=16">
+<link rel="stylesheet" href="hub.css?v=16">
+<link rel="stylesheet" href="chatbot.css?v=16">
+<link rel="stylesheet" href="gate.css?v=16">
+<link rel="stylesheet" href="guide.css?v=16">
 </head>
 <body>
-<div id="loader" role="status" aria-live="polite">
-  <div class="ldTitle">INITIALIZING LAB</div>
-  <div class="ldBar"><i id="ldFill"></i></div>
-  <div class="ldPct" id="ldPct">0%</div>
+<!-- Who is visiting? Hologram gate that replaces the old loading bar -->
+<div id="gate" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+  <div class="gateGrid" aria-hidden="true"></div>
+  <div class="gateHolo" id="gateHolo">
+    <i class="gc tl"></i><i class="gc tr"></i><i class="gc bl"></i><i class="gc br"></i>
+    <div class="gateScan" aria-hidden="true"></div>
+    <p class="gateEyebrow">// IDENTITY CHECK</p>
+    <h1 id="gateTitle">Who&rsquo;s visiting?</h1>
+    <p class="gateSub">Choose your path and I&rsquo;ll tailor the experience.</p>
+    <div class="gateCards" id="gateCards">
+      <button type="button" class="gateCard" data-mode="recruiter" data-hint="Recruiter? I&rsquo;ll skip the intro videos and show you the 30-second brief.">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="9" width="34" height="30" rx="4"/><circle cx="19" cy="21" r="5"/><path d="M11 33c1-5 4-7 8-7s7 2 8 7"/><path d="M30 19h7M30 25h7M30 31h5"/></svg>
+        <b>Recruiter</b><span>Hiring? Skip the cinematic and get the 30-second brief.</span><em>~30 sec</em>
+      </button>
+      <button type="button" class="gateCard" data-mode="client" data-hint="Client? I&rsquo;ll take you straight to the projects and live demos.">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 5l16 9v20L24 43 8 34V14z"/><path d="M8 14l16 9 16-9M24 23v20"/></svg>
+        <b>Client</b><span>Have a project? See my work, live demos and how to reach me.</span><em>~1 min</em>
+      </button>
+      <button type="button" class="gateCard" data-mode="viewer" data-hint="Viewer? Sit back &mdash; the full cinematic experience, start to end.">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="18"/><path d="M20 15l14 9-14 9z"/></svg>
+        <b>Viewer</b><span>Just exploring? Take the full cinematic tour, start to end.</span><em>full tour</em>
+      </button>
+    </div>
+    <div class="gateProg" id="gateProg" aria-live="polite">
+      <svg viewBox="0 0 44 44" aria-hidden="true"><circle class="rb" cx="22" cy="22" r="19"/><circle class="rf" id="gateRing" cx="22" cy="22" r="19"/></svg>
+      <span id="gatePct">0%</span><span class="gateProgTxt">Preparing the lab&hellip;</span>
+    </div>
+  </div>
 </div>
 <main id="stage">
 
@@ -82,7 +109,6 @@
 
 </main>
 
-<button id="skipBtn" type="button" aria-label="Skip this scene">Skip <span>&#9656;&#9656;</span></button>
 
 <!-- Beam flash used by the transition (outside #stage so it survives the swap) -->
 <div id="flash"></div>
@@ -129,9 +155,13 @@
 <!-- Project detail window (opens after a capsule opens) -->
 <div id="projModal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="pmName"></div>
 
-<script src="data.js?v=13"></script>
-<script src="script.js?v=13"></script>
-<script src="hub.js?v=13"></script>
-<script src="site.js?v=13"></script>
+<script src="data.js?v=16"></script>
+<script src="script.js?v=16"></script>
+<script src="hub.js?v=16"></script>
+<script src="site.js?v=16"></script>
+<script src="brain.js?v=16"></script>
+<script src="guide.js?v=16"></script>
+<script src="chatbot.js?v=16"></script>
+<script src="gate.js?v=16"></script>
 </body>
 </html>

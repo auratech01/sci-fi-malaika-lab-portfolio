@@ -66,7 +66,7 @@
   }
 
   window.startIntro = function () {
-    if (introOn) return;
+    if (introOn || hubOn) return;
     introOn = true; document.documentElement.dataset.scene = 'intro';
     layoutIntro();
     intro.classList.remove('hidden');
@@ -197,6 +197,10 @@
       svgHeart(), PH.quote ? el('blockquote', { class: 'quote' }, PH.quote) : null,
       ...String(PH.text || '').split(/\n+/).filter(Boolean).map(t => el('p', { class: 'phText' }, t)),
       PH.note ? el('div', { class: 'note' }, '✦ ' + PH.note) : null] });
+    if (window.__visitor === 'recruiter') {          // recruiters see the hiring-relevant cards first
+      const order = { education: 0, skills: 1, certs: 2, tools: 3, about: 4, philosophy: 5 };
+      P.sort((a, b) => (order[a.id] ?? 9) - (order[b.id] ?? 9));
+    }
     return P;
   }
 
@@ -228,6 +232,7 @@
     [...dots.children].forEach((d, k) => d.classList.toggle('on', k === idx));
     const last = idx === pages.length - 1;
     nextBtn.firstChild.textContent = last ? 'Projects' : 'Next';
+    document.dispatchEvent(new CustomEvent('hub:page', { detail: { id: pg.id, index: idx, total: pages.length } }));
     nextBtn.classList.toggle('last', last);
     prevBtn.style.visibility = idx === 0 ? 'hidden' : 'visible';
     typeText(bubble.querySelector('span'), (D.bubbles && (D.bubbles[pg.id] || D.bubbles.start)) || '', 24);
@@ -257,7 +262,18 @@
     window.initSite && window.initSite();
     setTimeout(() => { show(0, 1); }, 700);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+    document.dispatchEvent(new CustomEvent('hub:open', { detail: { visitor: window.__visitor || 'viewer' } }));
   }
+  window.hubGo = id => { const k = pages.findIndex(p => p.id === id); if (k >= 0) show(k, k < idx ? -1 : 1); return k >= 0; };
+  /* Skip for recruiters: leave every intro scene at once and open the hub */
+  window.skipToSite = function () {
+    if (hubOn) return;
+    firing = true; introOn = true;
+    window.__stopIntro && window.__stopIntro();
+    intro.classList.add('hidden'); welcomeEl.classList.add('hidden');
+    startHub();
+  };
+
   $('scrollCue').addEventListener('click', () => { const c = $('capsules'); c && c.scrollIntoView({ behavior: 'smooth' }); });
 
   /* resize + image preloading */

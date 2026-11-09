@@ -412,26 +412,6 @@ form.cForm h3{margin:0 0 2px;font:700 12px 'Orbitron','Segoe UI',sans-serif;lett
 [data-mode=mobile] .cap{min-height:62svh}
 [data-mode=mobile] .tube::before{opacity:.35;left:4%}
 
-/* ---------- Skip button ---------- */
-#skipBtn{position:fixed;z-index:120;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));padding:9px 16px;
-  font:700 12px 'Orbitron','Segoe UI',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#bffcff;background:rgba(2,16,22,.55);
-  border:1px solid rgba(0,229,255,.55);border-radius:30px;cursor:pointer;box-shadow:0 0 14px rgba(0,229,255,.3);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
-  -webkit-tap-highlight-color:transparent;transition:background .2s,box-shadow .2s}
-#skipBtn span{font-size:.8em;letter-spacing:-.1em;margin-left:.3em}
-#skipBtn:hover{background:rgba(0,229,255,.2);box-shadow:0 0 22px rgba(0,229,255,.6)}
-#skipBtn:focus-visible{outline:2px solid #fff;outline-offset:3px}
-html[data-scene=hub] #skipBtn{display:none}
-html[data-scene=intro][data-mode=mobile] #skipBtn{bottom:auto;top:calc(14px + env(safe-area-inset-top,0px))}
-html[data-scene=switch] #skipBtn{display:none}
-
-/* first-load loader: small progress bar over the door poster */
-#loader{position:fixed;z-index:130;left:50%;bottom:calc(28px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(280px,72vw);text-align:center;
-  font-family:'Share Tech Mono','Courier New',monospace;color:#7ff6ff;transition:opacity .6s ease}
-#loader.done{opacity:0;pointer-events:none}
-.ldTitle{font-size:12px;letter-spacing:.32em;text-shadow:0 0 10px rgba(0,229,255,.7);margin-bottom:10px}
-.ldBar{height:4px;border-radius:4px;background:rgba(0,229,255,.18);overflow:hidden;box-shadow:0 0 14px rgba(0,229,255,.25)}
-.ldBar i{display:block;height:100%;width:100%;transform:scaleX(0);transform-origin:left;background:linear-gradient(90deg,#00b8d4,#7ff6ff);box-shadow:0 0 12px #00e5ff;transition:transform .25s ease-out}
-.ldPct{font-size:11px;letter-spacing:.2em;margin-top:8px;opacity:.8}
 #openHotspot.wait{pointer-events:none}
 
 /* ---- phone polish (v13) ---- */
@@ -451,4 +431,6 @@ html[data-scene=switch] #skipBtn{display:none}
 .cStatus:empty{display:none}
 
 /* ?clean = recording mode: no hint arrows, Skip button, loader bar or scroll cue */
-html.clean #skipBtn,html.clean #loader,html.clean .arrowHint,html.clean #scrollCue{display:none!important}
+
+/* ?clean = recording mode: no hint arrows or scroll cue */
+html.clean .arrowHint,html.clean #scrollCue{display:none!important}

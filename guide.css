@@ -1,0 +1,78 @@
+/* ---------- AURA: the tiny guide robot ---------- */
+#aura{position:fixed;left:0;top:0;width:40px;height:48px;z-index:149;pointer-events:none;opacity:0;transition:opacity .4s;will-change:transform}
+#aura.on{opacity:1}
+#aura .aBody{width:100%;height:100%;transform-origin:50% 60%}
+#aura svg{display:block;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 6px rgba(0,229,255,.75))}
+#aura .aEyes{transform-box:fill-box;transform-origin:center;transition:transform .12s}
+#aura.blink .aEyeS{transform:scaleY(.12)}
+#aura .aEyeS{transform-box:fill-box;transform-origin:center;transition:transform .08s}
+#aura .aLed{animation:auraLed 1.5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes auraLed{0%,100%{opacity:.55;transform:scale(.85)}50%{opacity:1;transform:scale(1.25)}}
+#aura .aChest{animation:auraChest 2.2s ease-in-out infinite}
+@keyframes auraChest{50%{opacity:.45}}
+#aura .aJet{transform-box:fill-box;transform-origin:center top;animation:auraJet .16s linear infinite alternate}
+@keyframes auraJet{from{transform:scaleY(.8);opacity:.5}to{transform:scaleY(1.25);opacity:.9}}
+#aura .aHand{animation:auraHand 2.4s ease-in-out infinite}
+#aura .aHand.r{animation-delay:-1.2s}
+@keyframes auraHand{50%{transform:translateY(-2.5px)}}
+#aura.think .aEyes{animation:auraThink .8s ease-in-out infinite}
+@keyframes auraThink{0%,100%{transform:translate(-2.6px,-1px)}50%{transform:translate(2.6px,-1px)}}
+#aura.think .aJet{animation-duration:.08s}
+#auraTrail{position:fixed;inset:0;z-index:149;pointer-events:none;overflow:hidden}
+.aSpark{position:absolute;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:#bffcff;box-shadow:0 0 8px 2px rgba(0,229,255,.9);animation:spark .7s ease-out forwards}
+@keyframes spark{to{opacity:0;transform:translateY(14px) scale(.2)}}
+
+/* speech bubble (hologram glass) */
+#auraBubble{position:fixed;left:0;top:0;z-index:150;width:max-content;max-width:min(290px,calc(100vw - 20px));padding:9px 13px 10px;border-radius:12px;
+  background:rgba(2,16,22,.94);border:1px solid rgba(0,229,255,.75);box-shadow:0 0 22px rgba(0,229,255,.35),inset 0 0 18px rgba(0,229,255,.08);
+  color:#d7fbff;font:600 15.5px/1.38 'Rajdhani','Segoe UI',sans-serif;opacity:0;pointer-events:none;transition:opacity .25s;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+#auraBubble.show{opacity:1;pointer-events:auto}
+#auraBubble::after{content:'';position:absolute;left:var(--tail,50%);bottom:-6px;width:10px;height:10px;margin-left:-5px;transform:rotate(45deg);
+  background:rgba(2,16,22,.98);border-right:1px solid rgba(0,229,255,.75);border-bottom:1px solid rgba(0,229,255,.75)}
+#auraBubble.below::after{bottom:auto;top:-6px;transform:rotate(225deg)}
+.aName{display:block;margin-bottom:3px;font:400 10px 'Share Tech Mono',monospace;letter-spacing:.3em;color:#00e5ff;text-shadow:0 0 8px rgba(0,229,255,.7)}
+.aBtns{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.aChip{padding:5px 11px;border-radius:14px;border:1px solid rgba(0,229,255,.6);background:rgba(0,229,255,.08);color:#bffcff;cursor:pointer;
+  font:400 11.5px 'Share Tech Mono',monospace;letter-spacing:.05em;transition:background .2s}
+.aChip:hover,.aChip:focus-visible{background:rgba(0,229,255,.28);outline:none}
+.aChip.solid{background:#00e5ff;color:#02171c;border-color:#00e5ff;font-weight:700}
+.aChip.ghost{border-color:rgba(143,214,226,.35);color:#8fd6e2}
+
+/* holo card that AURA "ejects" */
+.aVeil{position:fixed;inset:0;z-index:147;background:rgba(1,8,12,.58);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);opacity:0;transition:opacity .45s}
+.aVeil.show{opacity:1}
+.aBeam{position:fixed;left:0;top:0;height:120px;margin-top:-60px;z-index:147;pointer-events:none;transform-origin:0 50%;opacity:0;
+  background:linear-gradient(90deg,rgba(127,246,255,.85),rgba(0,229,255,.25) 55%,rgba(0,229,255,0));clip-path:polygon(0 47%,100% 0,100% 100%,0 53%)}
+.aCard{position:fixed;inset:0;margin:auto;z-index:148;width:min(620px,calc(100vw - 20px));height:max-content;max-height:calc(100dvh - 24px);overflow:auto;
+  padding:clamp(18px,3.2vh,30px) clamp(16px,3vw,30px) clamp(16px,2.8vh,26px);color:#cfefff;font-family:'Rajdhani','Segoe UI',sans-serif;
+  background:linear-gradient(180deg,rgba(0,40,52,.93),rgba(2,16,22,.95) 55%,rgba(0,34,44,.93));border:1px solid rgba(0,229,255,.8);border-radius:6px;
+  box-shadow:0 0 50px rgba(0,229,255,.4),inset 0 0 50px rgba(0,229,255,.09);perspective:800px;scrollbar-width:thin;scrollbar-color:#00b8d4 transparent;outline:none}
+.aCard::before{content:'';position:absolute;inset:0;pointer-events:none;opacity:.5;background:repeating-linear-gradient(0deg,rgba(0,229,255,.06) 0 1px,transparent 1px 4px)}
+.aCard::after{content:'';position:absolute;left:0;right:0;top:-35%;height:35%;pointer-events:none;background:linear-gradient(180deg,transparent,rgba(127,246,255,.2),transparent);animation:scanSweep 4.5s ease-in-out 1s infinite}
+.aCard .gc{position:absolute;width:16px;height:16px}
+.aCard>*{position:relative}
+.aX{position:absolute!important;right:12px;top:12px;width:34px;height:34px;border:1px solid rgba(0,229,255,.6);border-radius:4px;background:rgba(2,16,22,.8);color:#00e5ff;font:400 18px/1 'Share Tech Mono',monospace;cursor:pointer;z-index:2}
+.aX:hover{background:rgba(0,229,255,.25)}
+.aK{margin:0;font:400 11.5px 'Share Tech Mono',monospace;letter-spacing:.3em;color:#00e5ff;text-shadow:0 0 8px rgba(0,229,255,.7);padding-right:40px}
+.aT{margin:.2em 0 .1em;font:800 clamp(20px,3.4vw,30px)/1.15 'Orbitron','Segoe UI',sans-serif;color:#eaffff;text-shadow:0 0 18px rgba(0,229,255,.55);padding-right:36px}
+.aSub{margin:0 0 14px;font:600 clamp(14px,1.8vw,17px) 'Rajdhani',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#8fd6e2}
+.aRow{display:grid;grid-template-columns:104px 1fr;gap:4px 14px;padding:9px 0;border-top:1px solid rgba(0,229,255,.2);align-items:start}
+.aRow>b{font:400 11px 'Share Tech Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:#00e5ff;padding-top:3px}
+.aRow>div{font:500 clamp(15px,1.7vw,17px)/1.38 'Rajdhani',sans-serif;color:#d7f6fb}
+.aChips{display:flex;flex-wrap:wrap;gap:5px}
+.aChips span{padding:1px 9px;border:1px solid rgba(0,229,255,.45);border-radius:11px;background:rgba(0,229,255,.08);font:400 11.5px 'Share Tech Mono',monospace;color:#bffcff}
+.aTile{padding:11px 12px;margin-top:9px;border:1px solid rgba(0,229,255,.4);border-radius:4px;background:rgba(0,229,255,.06)}
+.aTile h4{margin:0;font:700 14px 'Orbitron','Segoe UI',sans-serif;letter-spacing:.1em;color:#eaffff}
+.aTile p{margin:3px 0 8px;font:500 15px/1.35 'Rajdhani',sans-serif;color:#b9e6ee}
+.aActs{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.aBtn{display:inline-block;padding:8px 14px;border-radius:3px;border:1px solid #00e5ff;background:transparent;color:#00e5ff;cursor:pointer;text-decoration:none;
+  font:700 11px 'Orbitron','Segoe UI',sans-serif;letter-spacing:.14em;text-transform:uppercase;transition:background .2s,box-shadow .2s}
+.aBtn:hover,.aBtn:focus-visible{background:rgba(0,229,255,.22);box-shadow:0 0 14px rgba(0,229,255,.55);outline:none}
+.aBtn.solid{background:#00e5ff;color:#02171c}
+.aBtn.solid:hover{background:#7ff6ff}
+.aBtn.sm{padding:5px 10px;font-size:10px}
+
+[data-mode=mobile] #aura{width:34px;height:41px}
+[data-mode=mobile] .aRow{grid-template-columns:1fr;gap:2px}
+[data-mode=mobile] #auraBubble{font-size:15px}
+@media (prefers-reduced-motion:reduce){#aura .aLed,#aura .aChest,#aura .aJet,#aura .aHand,#aura.think .aEyes,.aCard::after{animation:none}}

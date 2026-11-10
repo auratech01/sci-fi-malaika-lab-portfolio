@@ -56,15 +56,24 @@ Bina iske limits tab bhi chalti hain, lekin Cloudflare kabhi kabhi Worker ko res
 
 ---
 
-## Check kaise karun ke chal raha hai?
-- Worker ka URL browser mein kholo. Likha aaye `{"error":"forbidden"}` to **sab theek hai**: Worker zinda hai aur sirf tumhari website ke liye khula hai.
-- Apni live website kholo, AURA par click karo. Upar likha hona chahiye **"Fact-checked AI, only from this portfolio"**.
-- Koi aisa sawal poochho jo built-in ko pakka na ho, jaise "what is her teamwork style like?". Jawab ke neeche **"AI answer · checked against the portfolio facts"** aana chahiye.
+## Check kaise karun ke chal raha hai? (diagnostic link)
+1. Browser mein apna Worker URL kholo (jaise `https://aura-chat.tumhara-naam.workers.dev`). Ek chhota status page aayega:
+   - `"running": true` matlab Worker chal raha hai.
+   - `"key_configured": true` matlab Secret mil gaya. `false` aaye to Step 4 dobara karo.
+   - Agar sirf `Hello World!` likha aaye, to `chatbot-worker.js` ka code abhi paste nahi hua: Edit code mein paste karke Deploy karo.
+2. Ab URL ke end mein `?test=1` lagao (jaise `https://aura-chat.tumhara-naam.workers.dev/?test=1`). Ye Gemini se ek chhota sa sawal poochta hai:
+   - `"gemini": "OK: Gemini answered..."` matlab sab kuch kaam kar raha hai.
+   - `"gemini": "FAIL (400): API key not valid..."` matlab key galat copy hui. Step 1 se nayi key lo aur Step 4 mein dobara daalo.
+   - `"gemini": "FAIL (503): ... high demand"` matlab Google ka model us waqt busy hai. Ye temporary hai: 2-5 minute baad dobara try karo. Naya Worker khud ek dafa dobara try karta hai aur phir doosra model use karta hai.
+   - `"gemini": "FAIL (404)..."` matlab model ka naam badal chuka hai (Google ne `gemini-2.5-flash` naye users ke liye band kar diya tha). Naya Worker code ab `gemini-3.8-flash` use karta hai aur ye na mile to khud `gemini-flash-latest` try karta hai. Phir bhi FAIL aaye to `chatbot-worker.js` mein `MODEL` line mein wo naam likho jo Google ka error message batata hai.
+3. Apni live website kholo (Ctrl+F5), AURA par click karo. Upar **"Fact-checked AI, only from this portfolio"** likha ho.
+4. Roman Urdu mein poochho, jaise "unki skills kya hain". Jawab Roman Urdu mein aur neeche **"AI answer · checked against the portfolio facts"** likha aana chahiye.
+
+Browser mein F12 dabao -> **Console** tab: agar AI tak nahi pohancha to wahan "AURA: the AI Worker could not be reached (...)" likha milega aur wajah bhi.
 
 ## Agar kuch na chale
 | Dikhta hai | Matlab | Kya karo |
 |---|---|---|
-| Worker URL par `{"error":"forbidden"}` | Normal hai | Kuch nahi |
 | Chat mein AI label kabhi nahi aata | URL `data.js` mein nahi / push nahi hua | Step 6 dobara dekho, browser mein Ctrl+F5 |
 | Worker URL (POST) par `not configured` | Secret nahi mila | Step 4: naam bilkul `GEMINI_API_KEY`, type **Secret** |
 | Worker `forbidden` deta hai apni site se bhi | Tumhari site ka address alag hai | `chatbot-worker.js` mein `ALLOWED_ORIGINS` mein apna sahi address likho (jaise `https://tumhara-naam.github.io`), phir dobara paste + Deploy |
@@ -81,4 +90,5 @@ AI ko purane facts yaad rehte hain. Dobara ye karo:
 ## Zaroori baatein
 - **Key kabhi bhi GitHub par chali jaye** (kisi file mein paste ho gayi) to foran aistudio.google.com/apikey se use delete karo aur nayi banao, phir Step 4 mein nayi daalo.
 - Free Gemini plan mein Google tumhare visitors ke sawal apni service behtar karne ke liye istemal kar sakta hai. Details Google ki terms mein hain; agar tum nahi chahti to paid plan dekhna.
+- AURA user ki zubaan mein jawab deti hai (English, Roman Urdu, Urdu script). Skills, tools, numbers aur links hamesha wahi rehte hain jo `data.js` mein likhe hain: agar AI koi skill ya number badle ya naya likhe to Worker wo jawab phenk deta hai.
 - Sawal ki limit ab **500 characters** hai. Isay badalna ho to `chatbot-worker.js` mein `maxChars`.

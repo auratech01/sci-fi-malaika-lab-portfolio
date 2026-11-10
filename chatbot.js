@@ -37,8 +37,9 @@
       const r = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctl.signal, body: JSON.stringify({ messages: history.slice(-6) }) });
       const j = await r.json().catch(() => null);
       if (r.status === 429 && j && j.reply) return { reply: j.reply, grounded: false };
-      if (!r.ok) throw new Error(r.status);
-      return j && typeof j.reply === 'string' && j.reply.trim() ? { reply: j.reply.trim(), grounded: j.grounded !== false } : null;
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      if (!(j && typeof j.reply === 'string' && j.reply.trim())) throw new Error('unexpected reply from the Worker (is chatbot-worker.js pasted and deployed?)');
+      return { reply: j.reply.trim(), grounded: j.grounded !== false };
     } finally { clearTimeout(t); }
   }
   const CONTACT = [{ label: 'Contact', q: 'How can I contact her?' }, { label: 'Projects', q: 'What projects has she built?' }];
@@ -47,12 +48,13 @@
   async function answerFor(text) {
     const local = brain ? brain.answer(text) : null;
     const sure = local && local.id !== 'unsure' && local.id !== 'empty' && local.conf >= 6;
-    if (ENDPOINT && (MODE === 'ai' || !sure) && aiCalls < AI_MAX && Date.now() - lastAi > 1200) {
+    const urdu = window.PortfolioBrain && window.PortfolioBrain.lang(text) !== 'en';        // answer in the visitor's language: let the AI write it
+    if (ENDPOINT && (MODE === 'ai' || !sure || urdu) && aiCalls < AI_MAX && Date.now() - lastAi > 1200) {
       try {
         aiCalls++; lastAi = Date.now();
         const r = await remote();
         if (r) return { text: r.reply, chips: r.grounded ? [] : CONTACT, ai: r.grounded };
-      } catch (e) { /* Worker down or slow: fall through to the built-in brain */ }
+      } catch (e) { console.warn('AURA: the AI Worker could not be reached (' + (e && e.message ? e.message : e) + '). Using the built-in answers. Open your Worker URL + ?test=1 to see why.'); }
     }
     return local || { text: 'I can answer questions about ' + first + "'s projects, skills and contact details.", chips: START };
   }

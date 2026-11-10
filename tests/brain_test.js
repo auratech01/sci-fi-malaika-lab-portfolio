@@ -30,6 +30,8 @@ const tests = [
  ['how old is she','personal'],['is she married','personal'],['what is the weather','offtopic'],['tell me a joke','offtopic'],['capital of france','offtopic'],
  ['skils','skills'],['projcts','projects'],['educaton','education'],['internhsip','availability'],['sentnel','project:0'],['cgpaa','education'],['contcat','contact'],
  ['asdfgh','unsure'],['blah blah','unsure'],['?','empty'],
+ // Roman Urdu
+ ['ap ka kya naam h','aura'],['aap kaise ho','smalltalk'],['malaika ki skills kya hain','skills'],['unka cgpa kitna hai','education'],['kya wo internship ke liye available hain','availability'],['projects batao','projects'],['rabta kaise karun','contact'],['assalam o alaikum','greet'],['shukria','thanks'],['mujhe kuch samajh nahi aya','unsure'],['how are you','smalltalk'],
  // opinion / unknown questions must NOT be answered with a confident wrong topic (they go to the AI, or say "not sure")
  ['what do you think about her design taste?','unsure'],['does she like pineapple pizza?','unsure'],['what is her teamwork style like?','unsure'],['is she a good team player','unsure'],
 ];
@@ -40,4 +42,7 @@ bad.forEach(x => console.log('  WRONG:', JSON.stringify(x[0]), 'expected', x[1],
 const b2 = Brain.make(D, {}); b2.answer('tell me about sentinel');
 const f1 = b2.answer('and its tech stack?'), f2 = b2.answer('links?'); b2.answer('jade lantern'); const f3 = b2.answer('how does it work');
 console.log('follow-ups:', [f1.id, f2.id, f3.id].join(', '), (f1.id === 'project:0:follow' && f2.id === 'project:0:follow' && f3.id === 'project:1:follow') ? 'OK' : 'PROBLEM');
-process.exit(bad.length ? 1 : 0);
+const ur = b.answer('ap ka kya naam h').text, un = b.answer('mujhe kuch samajh nahi aya').text;
+const langOk = /Mera naam/.test(ur) && /Mujhe ye sawal/.test(un) && Brain.lang('ap ka kya naam h') === 'roman' && Brain.lang('what is her cgpa') === 'en' && Brain.lang('آپ کا نام') === 'ur';
+console.log('answers come back in the visitor\'s language:', langOk ? 'OK' : 'PROBLEM');
+process.exit(bad.length || !langOk ? 1 : 0);

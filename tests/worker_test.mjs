@@ -7,7 +7,8 @@ const worker = (await import(pathToFileURL(tmp).href)).default;
 const facts = JSON.parse(src.match(/const FACT_LIST = (\[[\s\S]*?\n\]);/)[1]);
 const idOf = re => 'F' + (facts.findIndex(f => re.test(f)) + 1);
 let results = [], upstreamBody = null, upstreamHeaders = null, nextGemini = null;
-globalThis.fetch = async (url, init) => { upstreamBody = JSON.parse(init.body); upstreamHeaders = init.headers; if (nextGemini === 'down') return new Response('x', { status: 500 }); return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: JSON.stringify(nextGemini) }] } }] }), { status: 200 }); };
+let urls = [], hook = null;
+globalThis.fetch = async (url, init) => { urls.push(String(url)); if (hook) { const h = hook(String(url), JSON.parse(init.body)); if (h) return h; } upstreamBody = JSON.parse(init.body); upstreamHeaders = init.headers; if (nextGemini === 'down') return new Response('x', { status: 500 }); return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: JSON.stringify(nextGemini) }] } }] }), { status: 200 }); };
 const ORIGIN = 'https://auratech01.github.io';
 const env = { GEMINI_API_KEY: 'SECRET-KEY' };
 const call = async (body, o = ORIGIN, ip = '1.1.1.' + Math.floor(Math.random() * 250), e = env) => {
@@ -56,4 +57,39 @@ check('per-IP limit: 7th request in a minute gets 429', codes.slice(0, 6).every(
 const store = new Map(); const KV = { get: async k => store.get(k) ?? null, put: async (k, v) => { store.set(k, v); } };
 let last; for (let i = 0; i < 12; i++) last = await call(q('hi'), ORIGIN, '8.8.8.8', { GEMINI_API_KEY: 'k', CHAT_KV: KV });
 check('KV-backed limits work too', [...store.keys()].some(k => k.startsWith('m:8.8.8.8')) && last.status === 429, 'status ' + last.status);
+
+// --- language mirroring of the safe messages
+nextGemini = { answer: 'whatever', grounded: false, facts: [] };
+r = await call(q('ap ka favourite khana kya hai')); check('Roman Urdu question + no fact -> safe message in Roman Urdu', r.j.grounded === false && /Is sawal ka jawab/.test(r.j.reply), r.j.reply.slice(0, 60));
+r = await call(q('ان کا پسندیدہ کھانا کیا ہے')); check('Urdu-script question + no fact -> safe message in Urdu script', r.j.grounded === false && /[\u0600-\u06ff]/.test(r.j.reply));
+// --- invented / swapped technology
+nextGemini = { answer: 'She is an expert in React and Node.js.', grounded: true, facts: [idOf(/Core skills/)] };
+r = await call(q('what frameworks does she know')); check('technology that is not in the cited fact (React) is rejected', r.j.grounded === false);
+nextGemini = { answer: 'Unki core skills mein Python aur C++ shamil hain.', grounded: true, facts: [idOf(/Core skills - Programming/)] };
+r = await call(q('unki skills kya hain')); check('Roman Urdu answer that keeps Python and C++ exactly is allowed', r.j.grounded === true, r.j.reply);
+// --- Google renames the model or changes settings (this happened: gemini-2.5-flash was retired)
+const errRes = (status, message) => new Response(JSON.stringify({ error: { message } }), { status });
+nextGemini = { answer: 'Her email is auratech1101@gmail.com.', grounded: true, facts: [idOf(/Contact email/)] };
+urls = []; hook = u => u.includes('gemini-3.8-flash') ? errRes(404, 'models/gemini-3.8-flash is not found') : null;
+r = await call(q('email?')); check('model name retired (404) -> Worker switches to the fallback model by itself', r.j.grounded === true && urls.at(-1).includes('gemini-flash-latest'), urls.length + ' tries');
+urls = []; hook = (u, b) => (b.generationConfig.thinkingConfig && b.generationConfig.thinkingConfig.thinkingBudget === 0) ? errRes(400, 'thinking_budget is not supported for this model') : null;
+r = await call(q('email?')); check('unsupported thinking setting (400) -> Worker retries with another setting', r.j.grounded === true, urls.length + ' tries');
+urls = []; hook = () => errRes(400, 'API key not valid. Please pass a valid API key.');
+r = await call(q('email?')); check('wrong API key -> stops at once (no pointless retries) and returns 502', r.status === 502 && urls.length === 1, urls.length + ' call');
+hook = null; urls = [];
+// --- Google says "high demand" (503): wait, retry, then use another model
+let busyCalls = 0; urls = []; hook = u => u.includes('gemini-3.8-flash') ? (busyCalls++, errRes(503, 'This model is currently experiencing high demand.')) : null;
+r = await call(q('email?')); check('model busy (503) -> retried once, then another model answers', r.j.grounded === true && busyCalls === 2 && urls.at(-1).includes('flash-latest'), `${busyCalls} tries on the busy model, ${urls.length} calls`);
+hook = () => errRes(503, 'This model is currently experiencing high demand.');
+r = await call(q('email?')); check('every model busy -> 502 (website uses the built-in answers)', r.status === 502);
+hook = null; urls = [];
+// --- owner diagnostics (open the Worker URL in a browser)
+let g = await worker.fetch(new Request('https://w.example/', { method: 'GET' }), env); let gj = await g.json();
+check('GET shows status without leaking the key', g.status === 200 && gj.running === true && gj.key_configured === true && !JSON.stringify(gj).includes('SECRET'));
+g = await worker.fetch(new Request('https://w.example/', { method: 'GET' }), {}); gj = await g.json(); check('GET says clearly when the key is missing', gj.key_configured === false);
+nextGemini = { candidates: 1 }; g = await worker.fetch(new Request('https://w.example/?test=1', { method: 'GET', headers: { 'CF-Connecting-IP': '5.5.5.5' } }), env); gj = await g.json(); check('?test=1 reports that Gemini works', /^OK/.test(gj.gemini), gj.gemini);
+const realFetch = globalThis.fetch; globalThis.fetch = async () => new Response(JSON.stringify({ error: { message: 'API key not valid. Please pass a valid API key.' } }), { status: 400 });
+g = await worker.fetch(new Request('https://w.example/?test=1', { method: 'GET', headers: { 'CF-Connecting-IP': '6.6.6.6' } }), env); gj = await g.json(); check('?test=1 explains a wrong key in plain words', /FAIL \(400\).*API key not valid/.test(gj.gemini), gj.gemini);
+globalThis.fetch = realFetch;
 console.log(`\n${results.filter(Boolean).length}/${results.length} checks passed`);
+process.exit(results.every(Boolean) ? 0 : 1);

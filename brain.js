@@ -33,6 +33,15 @@
   }
   const W = str => { const m = {}; String(str).trim().split(/\s+/).forEach(p => { const [t, w] = p.split(':'); m[stem(norm(t).replace(/ /g, ''))] = +w || 3; }); return m; };
   const uniq = a => [...new Set(a)];
+  const ROMAN_MARK = new Set(('kya ka ki ke ko hai hain hy hn h mein me ap aap tum tumhara tumhari apka aapka apki aapki naam nam rabta karun batayein batao bataye bataiye bataen batain kaise kese kon kaun kab kahan kidhar kitna kitni kitne ' +
+    'nahi nhi mujhe mjy mujy mera meri mere hoon hun ho hota hoti karti karta karte kar kr kro karo krna sakti sakta sakte baare bare liye lye kia kiya uska uski unka unki wo woh yeh ye aur ya se tak par pe kuch sab bohat buhat bht zaroor shukria').split(' '));
+  const detectLang = text => {
+    const t = String(text || '');
+    if (/[\u0600-\u06ff]/.test(t)) return 'ur';
+    const w = norm(t).split(' ').filter(Boolean);
+    const hits = w.filter(x => ROMAN_MARK.has(x)).length;
+    return hits >= 2 || (hits >= 1 && w.length <= 3) ? 'roman' : 'en';
+  };
   const KNOWN_TECH = ('react angular vue svelte nextjs nodejs express java kotlin swift flutter dart php laravel django flask fastapi ruby rails golang rust csharp dotnet unity unreal godot ' +
     'docker kubernetes aws azure gcp firebase mongodb postgres postgresql mysql typescript tensorflow pytorch keras opencv pandas numpy sklearn scikit nlp openai langchain tailwind bootstrap ' +
     'jquery wordpress shopify blender photoshop illustrator excel powerbi tableau matlab r scala perl bash powershell redis graphql supabase').split(' ');
@@ -92,17 +101,26 @@
     const T = [];
     const topic = t => { t.kw = W(t.kw || ''); t.ph = t.ph || []; t.prio = t.prio || 0; T.push(t); return t; };
 
-    topic({ id: 'greet', kw: 'hi:6 hello:6 hey:6 salam:6 assalam:6 aoa:6 hola:5 sup:4 yo:3', ph: [/^(hi|hello|hey|salam|assalam)\b/], prio: -1,
-      a: () => `Hi! I'm ${(opts.name || 'AURA')}, ${first}'s guide robot. Ask me about her projects, skills, education or how to contact her.`, q: 'Hi', f: ['Projects', 'Skills', 'Contact'] });
-    topic({ id: 'thanks', kw: 'thanks:7 thank:7 shukria:7 thx:6 jazakallah:6 great:3 nice:3 cool:3 awesome:3 perfect:3 ok:2 okay:2', a: () => "You're welcome! Anything else you'd like to know?", q: 'Thanks', f: ['Projects', 'Contact'] });
-    topic({ id: 'bye', kw: 'bye:7 goodbye:7 later:3 allah:2 hafiz:5 khuda:3', ph: [/see (you|ya)/], a: () => 'Bye! Come back anytime. I will be right here.', q: 'Bye', f: [] });
-    topic({ id: 'aura', kw: 'aura:8 robot:4 bot:4 chatbot:5 assistant:4 you:1 yourself:3 made:1 built:1 created:1', ph: [/who (built|made|created|designed) (this|the) (site|website|portfolio|page)|who are you|what are you|your name|are you (a |an )?(bot|ai|robot|human|real|person)|who (made|built|created) you|about you\b|tell me about you\b/], prio: 3,
-      a: () => `I'm ${(opts.name || 'AURA')}, the tiny guide robot on ${first}'s portfolio. I answer from the facts on this site${opts.endpoint ? ', with a little help from an AI model' : ' (I am a small built-in assistant, not a big AI model)'}. I can show projects, skills, education, certificates and contact details.`, q: 'Who are you?', f: ['Projects', 'Skills', 'Contact'] });
-    topic({ id: 'help', kw: 'help:6 assist:4 can:1 do:1 ask:2 option:3 menu:3 feature:3', ph: [/what can you (do|answer|tell)|how (do|can) (i|you) (use|help)|what (should|can) i ask/], prio: 2,
-      a: () => `You can ask me things like:\n• "What projects has ${first} built?"\n• "Does she know Python?"\n• "What is her CGPA?"\n• "Is she open to internships?"\n• "How can I contact her?"`, q: 'What can I ask?', f: ['Projects', 'Skills', 'Education', 'Contact'] });
+    const NM = () => (opts.name || 'AURA');
+    const pick = (ctx, en, roman, ur) => (ctx && ctx.lang === 'ur' ? (ur || roman) : ctx && ctx.lang === 'roman' ? roman : en);
+    topic({ id: 'greet', kw: 'hi:6 hello:6 hey:6 salam:6 assalam:6 aoa:6 hola:5 sup:4 yo:3 alaikum:6', ph: [/^(hi|hello|hey|salam|assalam)\b/], prio: -1,
+      a: ctx => pick(ctx, `Hi! I'm ${NM()}, ${first}'s guide robot. Ask me about her projects, skills, education or how to contact her.`,
+        `Assalam o Alaikum! Main ${NM()} hoon, ${first} ki guide robot. Aap mujh se unke projects, skills, education ya rabta karne ke baare mein pooch sakte hain.`,
+        `السلام علیکم! میں ${NM()} ہوں، ${first} کی گائیڈ روبوٹ۔ آپ مجھ سے ان کے پروجیکٹس، اسکلز، تعلیم یا رابطے کے بارے میں پوچھ سکتے ہیں۔`), q: 'Hi', f: ['Projects', 'Skills', 'Contact'] });
+    topic({ id: 'smalltalk', kw: 'kaise:3 kese:3 hal:3 haal:3', ph: [/how are you|how r u|how do you do|kaise ho|kese ho|kaisi ho|kya hal|kya haal|aap kaise|ap kaise|tum kaise|how is it going/], prio: 3,
+      a: ctx => pick(ctx, `I'm doing great, thanks for asking! What would you like to know about ${first}?`, `Main bilkul theek hoon, shukriya! ${first} ke baare mein kya jaanna chahte hain?`, `میں بالکل ٹھیک ہوں، شکریہ! ${first} کے بارے میں آپ کیا جاننا چاہتے ہیں؟`), q: 'How are you?', f: ['Projects', 'Skills', 'Contact'] });
+    topic({ id: 'thanks', kw: 'thanks:7 thank:7 shukria:7 thx:6 jazakallah:6 great:3 nice:3 cool:3 awesome:3 perfect:3 ok:2 okay:2 mehrbani:6', a: ctx => pick(ctx, "You're welcome! Anything else you'd like to know?", 'Koi baat nahi! Kuch aur poochna ho to zaroor batayein.', 'کوئی بات نہیں! کچھ اور پوچھنا ہو تو ضرور بتائیں۔'), q: 'Thanks', f: ['Projects', 'Contact'] });
+    topic({ id: 'bye', kw: 'bye:7 goodbye:7 later:3 allah:2 hafiz:5 khuda:3', ph: [/see (you|ya)/], a: ctx => pick(ctx, 'Bye! Come back anytime. I will be right here.', 'Allah hafiz! Jab dil chahe wapas aaiye, main yahin hoon.', 'اللہ حافظ! جب دل چاہے واپس آئیے، میں یہیں ہوں۔'), q: 'Bye', f: [] });
+    topic({ id: 'aura', kw: 'aura:8 robot:4 bot:4 chatbot:5 assistant:4 you:1 yourself:3 made:1 built:1 created:1', ph: [/who (built|made|created|designed) (this|the) (site|website|portfolio|page)|who are you|what are you|your name|are you (a |an )?(bot|ai|robot|human|real|person)|who (made|built|created) you|about you\b|tell me about you\b|(ap|aap|tum|apka|aapka|tumhara|tumhari)\s+(ka\s+|ki\s+)?(kya\s+)?(naam|nam)|(ap|aap|tum)\s+(kon|kaun|kya)\s+(ho|hain|hai|h)|apna (naam|nam)|ap ka naam|aap ka naam/], prio: 3,
+      a: ctx => pick(ctx, `I'm ${NM()}, the tiny guide robot on ${first}'s portfolio. I answer from the facts on this site${opts.endpoint ? ', with a little help from an AI model' : ' (I am a small built-in assistant, not a big AI model)'}. I can show projects, skills, education, certificates and contact details.`,
+        `Mera naam ${NM()} hai. Main ${first} ki portfolio ki chhoti guide robot hoon aur is website ki maloomat se jawab deti hoon${opts.endpoint ? '' : ' (main ek chhota built-in assistant hoon, bara AI model nahi)'}. Aap mujh se projects, skills, education, certificates aur contact ke baare mein pooch sakte hain.`,
+        `میرا نام ${NM()} ہے۔ میں ${first} کی پورٹ فولیو کی چھوٹی گائیڈ روبوٹ ہوں اور اس ویب سائٹ کی معلومات سے جواب دیتی ہوں۔ آپ مجھ سے پروجیکٹس، اسکلز، تعلیم اور رابطے کے بارے میں پوچھ سکتے ہیں۔`), q: 'Who are you?', f: ['Projects', 'Skills', 'Contact'] });
+    topic({ id: 'help', kw: 'help:6 assist:4 can:1 do:1 ask:2 option:3 menu:3 feature:3 madad:6 madat:6', ph: [/what can you (do|answer|tell)|how (do|can) (i|you) (use|help)|what (should|can) i ask|kya (kar|kr) sakti|kya poochu|kya pooch/], prio: 2,
+      a: ctx => pick(ctx, `You can ask me things like:\n• "What projects has ${first} built?"\n• "Does she know Python?"\n• "What is her CGPA?"\n• "Is she open to internships?"\n• "How can I contact her?"`,
+        `Aap mujh se aise sawal pooch sakte hain:\n• "${first} ke projects kya hain?"\n• "Kya unhein Python aati hai?"\n• "Unka CGPA kitna hai?"\n• "Kya wo internship ke liye available hain?"\n• "Unse rabta kaise karun?"`), q: 'What can I ask?', f: ['Projects', 'Skills', 'Education', 'Contact'] });
     topic({ id: 'about', kw: 'about:2 introduce:5 background:4 bio:5 profile:3 summary:4 overview:4 malaika:4 fatima:3 who:2 kon:3 kaun:3 tareef:5 introduction:5', ph: [/who (is|s) (malaika|she|her|this)|^(tell me |say )?(something |more |a bit )?about (malaika|her|herself)$|introduce (her|malaika)|what does (she|malaika) do$/], prio: 1,
       a: () => `${(D.about || [])[0] || ''}\n\n${D.role || ''} · ${D.tagline || ''}`.trim(), q: `Who is ${first}?`, f: ['Education', 'Projects', 'Skills'] });
-    topic({ id: 'skills', kw: 'skill:6 technolog:3 tech:3 stack:4 language:3 expertise:5 proficient:5 proficiency:5 knowledge:3 abilit:4 capabilit:4 competenc:5 programming:4 coding:3 code:2 develop:2 strength:1 toolkit:3 know:2', ph: [/what (can|does) (she|malaika) (do|know|code|use)|tech(nical)? stack|programming languages?|skill ?set/], prio: 1,
+    topic({ id: 'skills', kw: 'maharat:5 hunar:5 skill:6 technolog:3 tech:3 stack:4 language:3 expertise:5 proficient:5 proficiency:5 knowledge:3 abilit:4 capabilit:4 competenc:5 programming:4 coding:3 code:2 develop:2 strength:1 toolkit:3 know:2', ph: [/what (can|does) (she|malaika) (do|know|code|use)|tech(nical)? stack|programming languages?|skill ?set/], prio: 1,
       a: () => skillText(), q: 'What are her skills?', f: ['AI', 'Projects', 'Tools'] });
     topic({ id: 'ai', kw: 'ai:7 artificial:5 intelligence:4 ml:7 machine:3 learning:2 neural:5 network:1 gemini:5 llm:6 deep:2 nlp:6 model:2 chatgpt:5 openai:5 data:1 science:2', ph: [/machine learning|deep learning|neural net|artificial intelligence|\bai\b/], prio: 2,
       a: () => { const g = P.find(x => (x.tags || []).some(t => /gemini/i.test(t))); return `AI is ${first}'s main focus. ` + (g ? `In **${g.name}** she integrates the Google Gemini API for AI-assisted code auditing. ` : '') + (exploreItems.length ? `She is currently exploring: ${exploreItems.join(', ')}.` : '') + `\nThe portfolio does not claim any trained ML models yet, she is learning it step by step.`; },
@@ -176,13 +194,15 @@
     /* ---------- answer ---------- */
     const CHIP_Q = { 'Projects': 'What projects has she built?', 'Skills': 'What are her skills?', 'Contact': 'How can I contact her?', 'Education': 'What is her education?', 'AI': 'What AI work has she done?',
       'Tools': 'Which tools does she use?', 'Resume': 'Where is her resume?', 'About': `Who is ${first}?`, 'Certificates': 'What certificates does she have?', 'Is she available?': 'Is she open to internships?' };
+    const LEAD = { skills: 'Malaika ki skills:', projects: 'Malaika ke projects:', education: 'Malaika ki education:', certs: 'Malaika ke certificates:', tools: 'Malaika ke tools:', contact: 'Rabta karne ke raaste:', resume: 'Malaika ka resume:', availability: 'Availability:', best: 'Malaika ka sab se bara project:', about: 'Malaika ke baare mein:', location: 'Location:', strengths: 'Mukhtasar taaruf:' };
     function reply(text, chips, id, conf) { return { text, chips: (chips || []).map(c => ({ label: c, q: CHIP_Q[c] || c })), id, conf: conf || 0 }; }
 
     function answer(question) {
       const raw = norm(question);
-      if (!raw) return reply('Ask me anything about ' + first + '.', ['Projects', 'Skills', 'Contact'], 'empty');
+      const lang = detectLang(question);
+      if (!raw) return reply(lang === 'en' ? 'Ask me anything about ' + first + '.' : first + ' ke baare mein kuch bhi poochiye.', ['Projects', 'Skills', 'Contact'], 'empty');
       const tk = fix(norm(question).split(' ').filter(Boolean)), set = new Set(tk);
-      const ctx = { raw, set, tk };
+      const ctx = { raw, set, tk, lang };
 
       // 1) exact technology lookup ("does she know Python?", "which project uses Canvas?")
       const hit = findTech(question);
@@ -227,16 +247,22 @@
       if (top && top.s >= 4) {
         const t = top.t;
         if (t.project == null && t.id !== 'best') state.lastProject = -1;     // topic changed: forget the last project
-        return reply(t.a(ctx), t.f, t.id, top.s);
+        let text = t.a(ctx);
+        if (lang !== 'en' && LEAD[t.id] && !/[\u0600-\u06ff]/.test(text)) text = LEAD[t.id] + '\n' + text;     // short Roman Urdu lead-in (the facts stay exactly as written)
+        return reply(text, t.f, t.id, top.s);
       }
 
       // 3) not sure: say so and offer the closest topics
       const sug = uniq(scored.filter(x => x.t.q).slice(0, 3).map(x => x.t.q));
       const defaults = ['What projects has she built?', 'What are her skills?', 'How can I contact her?'];
       const list = uniq([...sug, ...defaults]).slice(0, 3);
-      return { text: "I'm not sure I understood that. I know about " + first + "'s projects, skills, education, certificates and contact details. Did you mean one of these?", chips: list.map(q => ({ label: q, q })), id: 'unsure', conf: 0 };
+      if (lang === 'en') return { text: "I'm not sure I understood that. I know about " + first + "'s projects, skills, education, certificates and contact details. Did you mean one of these?", chips: list.map(q => ({ label: q, q })), id: 'unsure', conf: 0 };
+      const ur = lang === 'ur';
+      const chipsUr = ur ? ['پروجیکٹس کیا ہیں؟', 'اسکلز کیا ہیں؟', 'رابطہ کیسے کروں؟'] : [first + ' ke projects kya hain?', first + ' ki skills kya hain?', 'Rabta kaise karun?'];
+      return { text: ur ? `مجھے یہ سوال پوری طرح سمجھ نہیں آیا۔ میں ${first} کے پروجیکٹس، اسکلز، تعلیم، سرٹیفکیٹس اور رابطے کے بارے میں بتا سکتی ہوں۔ کیا ان میں سے کچھ پوچھنا چاہیں گے؟`
+        : `Mujhe ye sawal poori tarah samajh nahi aaya. Main ${first} ke projects, skills, education, certificates aur contact ke baare mein bata sakti hoon. Kya inmein se kuch poochna chahte hain?`, chips: chipsUr.map(q => ({ label: q, q })), id: 'unsure', conf: 0 };
     }
     return { answer, state };
   }
-  return { make, norm };
+  return { make, norm, lang: detectLang };
 });
